@@ -16,6 +16,8 @@ $_TRAN["_pl"]["utilities"]="Użytki";
 
 $_TRAN["_en"]["thickness"]="Thickness";
 $_TRAN["_pl"]["thickness"]="Grubość";
+$_TRAN["_en"]["cardboard_type"]="Cardboard type";
+$_TRAN["_pl"]["cardboard_type"]="Typ tektury";
 $_TRAN["_en"]["calc_lang"]="Język kalkulacji";
 $_TRAN["_pl"]["calc_lang"]="Calculation lang";
 $_TRAN["_en"]["customer_data"]="Customer data";
