@@ -61,13 +61,13 @@ $_KURS=$_GET[kurs];
 //			<div class="span12">
 
 		?>
-			<?if(!$_GET['print']){?><h3><?SL("valuation_order",$_GET[pricing_lang]);?></h3><?}?>
+			<?if(!$_GET['print']){?><h3><?SL("valuation_order",$_GET[pricing_lang]);?></h3><?} //WYCENA SHOW ?> 
 			<fieldset>
 				<div class="row-fluid">
 					<div class="span6">
 						<legend><?SL("parameters",$_GET[pricing_lang]);?></legend>
 						<?SL("type_of_product",$_GET[pricing_lang]);?>&nbsp; <strong><?=$_GET[typ_nazwa]?></strong><br/>
-						<!--><?SL("thickness",$_GET[pricing_lang]);?>&nbsp;<strong><?=$_GET[grubosc]?></strong><br/> -->
+						<!--<?SL("thickness",$_GET[pricing_lang]);?>&nbsp;<strong><?=$_GET[grubosc]?></strong><br/> -->
 						<?SL("product_format",$_GET[pricing_lang]);?> &nbsp;<strong><?=$_GET[format_x]?> x <?=$_GET[format_y]?></strong>
 					</div>
 					<div class="span6">
@@ -683,8 +683,8 @@ $_KURS=$_GET[kurs];
 									if($_GET[tektura]){
 										$sql="SELECT materials.id, name, price_range, price FROM materials JOIN ceny_zakres ON materials.id = ceny_zakres.id_item ";
 										//$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
-										$sql.="WHERE materials.id='$_GET[tektura]' AND ";
-										$sql.="'$_GET[liczba]'<=price_range ORDER BY price_range";
+										$sql.="WHERE materials.id='$_GET[tektura]' ";
+										//$sql.="'$_GET[liczba]'<=price_range ORDER BY price_range";
 										//$sql.="szt_od<='".$_GET[liczba]."' AND szt_do='0') ";
 										$sql.=" LIMIT 0,1";
 										list($id_material,$name, $price_range, $price)=mysql_fetch_row(mysql_query($sql));
@@ -697,15 +697,8 @@ $_KURS=$_GET[kurs];
 											echo $name;
 											//if($cena>0){echo $cena." ".$waluta." ";}
 											//if($cena_szt>0){echo "+ ".$cena_szt." ".$waluta."/szt. ".$cena_typ;}
-											echo "</strong>";
-											echo "<span class='label label-success'>";
-											//SL("print_type",$_GET[pricing_lang]);
-											echo 'Cena za m2';
-											echo ": </span>&nbsp;<strong>";
-											echo "PLN ".number_format($price, 3);
-											//if($cena>0){echo $cena." ".$waluta." ";}
-											//if($cena_szt>0){echo "+ ".$cena_szt." ".$waluta."/szt. ".$cena_typ;}
-											echo "</strong>";
+											echo "</strong>&nbsp;";
+											
 											echo "</pre>";
 										}else{?>
 												<span class='label label-important'><?SL("no_out_sticker_print_format",$_GET[pricing_lang]);?></span>
@@ -714,7 +707,7 @@ $_KURS=$_GET[kurs];
 									}else{
 										echo "<span class='label label-warning'>";
 										//SL("product_without_out_sticker_print",$_GET[pricing_lang]);
-										echo 'Nie znaleziono ceny tektury';
+										echo 'Wybierz Rodzaj Tektury';
 										echo "</span>";
 									}
 									?>
@@ -738,6 +731,10 @@ $_KURS=$_GET[kurs];
 												echo "<span class='label label-warning'>";
 												SL("sel_type_product",$_GET[pricing_lang]);
 												echo "</span>";
+										//}elseif(!$_GET[grubosc]){
+										//	echo "<span class='label label-warning'>";
+										//	SL("select_thickness",$_GET[pricing_lang]);
+										//	echo "</span>";
 										}else{
 											if(!$_GET[format_x])$_GET[format_x]="555";
 											if(!$_GET[format_y])$_GET[format_y]="315";
@@ -754,48 +751,37 @@ $_KURS=$_GET[kurs];
 											<?
 											if($_GET[wczytaj]==1 && $_GET[format_x] && $_GET[format_y])
 											{
-												$sql="SELECT id_format,format_x_od,format_x_do,format_y_od,format_y_do,tektura_x,tektura_y,sztuk_arkusz FROM format_tektura ";
-												//$sql.="WHERE typ='$_GET[typ]' AND (";
-												$sql.="WHERE (";
-												$sql.="(format_x_od<='$_GET[format_x]' AND format_x_do>='$_GET[format_x]' ";
-												$sql.="AND format_y_od<='$_GET[format_y]' AND format_y_do>='$_GET[format_y]') ";
-												$sql.=" OR ";
-												$sql.="(format_x_od<='$_GET[format_y]' AND format_x_do>='$_GET[format_y]' ";
-												$sql.=" AND format_y_od<='$_GET[format_x]' AND format_y_do>='$_GET[format_x]') )";
-												//$sql.=") AND grubosc_od<='$_GET[grubosc]' AND grubosc_do>='$_GET[grubosc]' ";
-												$sql.="AND del='0' ORDER BY prio ASC";
-												list($id_format,$format_x_od,$format_x_do,$format_y_od,$format_y_do,$tektura_x,$tektura_y,$sztuk_arkusz)=mysql_fetch_row(mysql_query($sql));
-												if(!$_GET[typ]){
-													echo "<span class='label label-warning'>";
-													SL("sel_type_product",$_GET[pricing_lang]);
-													echo "</span><strong>";
-												}elseif(!$_GET[grubosc]){
-													echo "<span class='label label-warning'>";
-													SL("select_thickness",$_GET[pricing_lang]);
-													echo "</span>";
-												}elseif($id_format){
-													echo "<pre>";
-													echo "<span class='label label-success'>";
-													SL("paperboard",$_GET[pricing_lang]);
-													echo "</span>&nbsp;<strong>";
-													//if($format_x_od != $format_x_do){echo "od ".$format_x_od." do ".$format_x_do;}else{echo $format_x_od;}
-													echo $tektura_x." x ".$tektura_y;
-													//if($format_y_od != $format_y_do){echo "od ".$format_y_od." do ".$format_y_do;}else{echo $format_y_od;}
-													echo "</strong>&nbsp;<span class='label label-success'>";
-													SL("utilities",$_GET[pricing_lang]);
-													echo "</span>&nbsp;";
-													echo " <strong>".$sztuk_arkusz."&nbsp;";
-													SL("items_per_sheet",$_GET[pricing_lang]);
-													echo "</strong>";
-													echo "</pre>";
-												}else{
-													echo "<span class='label label-important'>";
-													SL("no_paperboard_format",$_GET[pricing_lang]);
-													echo "</span>";
-													echo "&nbsp;<a target='_blank' class='btn btn-mini btn-primary' role='button' href='wyceny_formaty.php?typ=$_GET[typ]&add=1'>";
-													SL("add_new_paperboard_formate",$_GET[pricing_lang]);
-													echo "</a>";
-												}
+											$cardboard = round(($_GET[format_x] * $_GET[format_y])/1000000 * $_GET[liczba],3);
+											//$cardboard = floor($cardboard * 100) / 100;
+											$cardboard = ceil($cardboard);	
+									    $sql="SELECT materials.id, name, price_range, price FROM materials JOIN ceny_zakres ON materials.id = ceny_zakres.id_item ";
+										//$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
+										$sql.="WHERE materials.id='$_GET[tektura]' AND ";
+										$sql.="$cardboard<=price_range ORDER BY price_range";
+										//$sql.="szt_od<='".$_GET[liczba]."' AND szt_do='0') ";
+										$sql.=" LIMIT 0,1";
+										list($id_material,$name, $price_range, $price)=mysql_fetch_row(mysql_query($sql));
+										if($id_material){
+											
+											echo "<pre>";
+											echo "<span class='label label-success'>";
+											//SL("print_type",$_GET[pricing_lang]);
+											echo 'Tektura m2';
+											echo ": </span>&nbsp;<strong>";
+											echo $cardboard;
+											//if($cena>0){echo $cena." ".$waluta." ";}
+											//if($cena_szt>0){echo "+ ".$cena_szt." ".$waluta."/szt. ".$cena_typ;}
+											echo "</strong>&nbsp;";
+											echo "<span class='label label-success'>";
+											//SL("print_type",$_GET[pricing_lang]);
+											echo 'Cena za m2';
+											echo ": </span>&nbsp;<strong>";
+											echo "PLN ".number_format($price, 3);
+											//if($cena>0){echo $cena." ".$waluta." ";}
+											//if($cena_szt>0){echo "+ ".$cena_szt." ".$waluta."/szt. ".$cena_typ;}
+											echo "</strong>";
+											echo "</pre>";
+										}
 											}else{
 												echo "<span class='label label-warning'>";
 												SL("specify_product_format",$_GET[pricing_lang]);
@@ -839,44 +825,60 @@ $_KURS=$_GET[kurs];
 								</div>
 							</div>
 							<?
-							if($id_format){
+							if($cardboard){
 							?>
 							<div class="row-fluid">
 								<div class="span6">
+									
 									<legend><?SL("out_sticker_paper",$_GET[pricing_lang]);?></legend>
+									<label class="inline"><?SL("paper_type",$_GET[pricing_lang]);?>&nbsp;
 									<?
-									$sql="SELECT id_format as id_format_oklejka,papier_x as papier_oklejka_x,papier_y as papier_oklejka_y,grubosc_od,sztuk_arkusz FROM format_oklejka ";
-									//$sql.="WHERE typ='$_GET[typ]' AND";
-									$sql.="WHERE ";
-									$sql.="(";
-									$sql.="(format_x_od<='$_GET[format_x]' AND format_x_do>='$_GET[format_x]' ";
-									$sql.="AND format_y_od<='$_GET[format_y]' AND format_y_do>='$_GET[format_y]')";
-									$sql.=" OR ";
-									$sql.="(format_x_od<='$_GET[format_y]' AND format_x_do>='$_GET[format_y]' ";
-									$sql.="AND format_y_od<='$_GET[format_x]' AND format_y_do>='$_GET[format_x]') ";
-									$sql.=") ";
-									$sql.="AND del='0' ORDER BY prio ASC";
-									list($id_format_oklejka,$papier_oklejka_x,$papier_oklejka_y,$grubosc_od,$sztuk_arkusz)=mysql_fetch_row(mysql_query($sql));
-									if($id_format_oklejka){
-										echo "<pre>";
-										echo "<span class='label label-success'>";
-										SL("paper_format",$_GET[pricing_lang]);
-										echo ": </span>&nbsp;<strong>";
-										echo $papier_oklejka_x." x ".$papier_oklejka_y."</strong><br/>";
-										echo "<span class='label label-success'>";
-										SL("grammage",$_GET[pricing_lang]);
-										echo ": </span>&nbsp;<strong>&nbsp;";
-										echo $grubosc_od."</strong><br/>";
-										echo "<span class='label label-success'>";
-										SL("utilities",$_GET[pricing_lang]);
-										echo ": </span>&nbsp;<strong>&nbsp;";
-										echo $sztuk_arkusz." ";
-										SL("items_per_sheet",$_GET[pricing_lang]);
-										echo "</strong>";
-										echo "</pre>";
-									}else{?>
+									//$sql="SELECT DISTINCT druk_typ as druk_typ_oklejka FROM druk_oklejka WHERE typ='$_GET[typ]' AND del='0' ORDER BY druk_typ";
+									$sql="SELECT DISTINCT id as id_material, name FROM materials WHERE typ='papier' ORDER BY id_material";
+									$res=mysql_query($sql);
+									?>
+									<select name="papiero" onChange="document.forms['wycena'].action='#Druk_oklejka';document.forms['wycena'].submit()">
+									<option value="">-- <?SL("select",$_GET[pricing_lang]);?> --</option>
+									<?
+									while($dane=mysql_fetch_array($res)){
+										echo "<option ";
+										if($_GET[papiero]==$dane[id_material]){echo " selected ";}
+										echo " value='".$dane[id_material]."'>".$dane[name]."</option>";
+									}
+									?>
+									</select>
+									</label>
+									<?
+									    $sql="SELECT materials.id, name, price_range, price FROM materials JOIN ceny_zakres ON materials.id = ceny_zakres.id_item ";
+										//$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
+										$sql.="WHERE materials.id='$_GET[papiero]' AND ";
+										$sql.="$cardboard<=price_range ORDER BY price_range";
+										//$sql.="szt_od<='".$_GET[liczba]."' AND szt_do='0') ";
+										$sql.=" LIMIT 0,1";
+										list($id_material,$name, $price_range, $price)=mysql_fetch_row(mysql_query($sql));
+										if($id_material){
+											
+											echo "<pre>";
+											echo "<span class='label label-success'>";
+											//SL("print_type",$_GET[pricing_lang]);
+											echo 'Papier m2';
+											echo ": </span>&nbsp;<strong>";
+											echo $cardboard;
+											//if($cena>0){echo $cena." ".$waluta." ";}
+											//if($cena_szt>0){echo "+ ".$cena_szt." ".$waluta."/szt. ".$cena_typ;}
+											echo "</strong>&nbsp;";
+											echo "<span class='label label-success'>";
+											//SL("print_type",$_GET[pricing_lang]);
+											echo 'Cena za m2';
+											echo ": </span>&nbsp;<strong>";
+											echo "PLN ".number_format($price, 3);
+											//if($cena>0){echo $cena." ".$waluta." ";}
+											//if($cena_szt>0){echo "+ ".$cena_szt." ".$waluta."/szt. ".$cena_typ;}
+											echo "</strong>";
+											echo "</pre>";
+										}else{?>
 											<span class='label label-important'><?SL("no_out_sticker_paper",$_GET[pricing_lang]);?></span>
-											<a target='_blank' class='btn btn-mini btn-primary' role='button' href='wyceny_formaty_oklejka.php?typ=$_GET[typ]&add=1'><?SL("out_sticker_paper",$_GET[pricing_lang]);?>Dodaj nowy format oklejki</a>
+											
 									<?}?>
 								</div>
 								<div class="span6">
@@ -884,44 +886,60 @@ $_KURS=$_GET[kurs];
 									<small> - <?SL("in_sticker_paper",$_GET[pricing_lang]);?>&nbsp;<input type="checkbox" name="bez_papier_wklejka" value="1" onClick="document.forms['wycena'].action='#Parametry_wyceny';document.forms['wycena'].submit()"
 									<?if($_GET[bez_papier_wklejka]=="1")echo "checked";?>
 									></small></legend>
+									<label class="inline"><?SL("paper_type",$_GET[pricing_lang]);?>&nbsp;
+									<?
+									//$sql="SELECT DISTINCT druk_typ as druk_typ_oklejka FROM druk_oklejka WHERE typ='$_GET[typ]' AND del='0' ORDER BY druk_typ";
+									$sql="SELECT DISTINCT id as id_material, name FROM materials WHERE typ='papier' ORDER BY id_material";
+									$res=mysql_query($sql);
+									?>
+									<select name="papierw" onChange="document.forms['wycena'].action='#Druk_wklejka';document.forms['wycena'].submit()">
+									<option value="">-- <?SL("select",$_GET[pricing_lang]);?> --</option>
+									<?
+									while($dane=mysql_fetch_array($res)){
+										echo "<option ";
+										if($_GET[papierw]==$dane[id_material]){echo " selected ";}
+										echo " value='".$dane[id_material]."'>".$dane[name]."</option>";
+									}
+									?>
+									</select>
+									</label>
 									<?
 									if($_GET[bez_papier_wklejka]=="1"){
 									?>
-										<span class='label label-important'><?SL("no_out_sticker_paper",$_GET[pricing_lang]);?></span>
+										<span class='label label-important'><?SL("no_in_sticker_paper",$_GET[pricing_lang]);?></span>
 									<?
 									}else{
-										$sql="SELECT id_format as id_format_wklejka,papier_x as papier_wklejka_x,papier_y as papier_wklejka_y,grubosc_od,sztuk_arkusz FROM format_wklejka ";
-										//$sql.="WHERE typ='$_GET[typ]' AND ";
-										$sql.="WHERE ";
-										$sql.="(";
-										$sql.="(format_x_od<='$_GET[format_x]' AND format_x_do>='$_GET[format_x]' ";
-										$sql.="AND format_y_od<='$_GET[format_y]' AND format_y_do>='$_GET[format_y]') ";
-										$sql.=" OR ";
-										$sql.="(format_x_od<='$_GET[format_y]' AND format_x_do>='$_GET[format_y]' ";
-										$sql.="AND format_y_od<='$_GET[format_x]' AND format_y_do>='$_GET[format_x]') ";
-										$sql.=") ";
-										$sql.="AND del='0' ORDER BY prio ASC";
-										list($id_format_wklejka,$papier_wklejka_x,$papier_wklejka_y,$grubosc_od,$sztuk_arkusz)=mysql_fetch_row(mysql_query($sql));
-										if($id_format_wklejka){
+										
+										$sql="SELECT materials.id, name, price_range, price FROM materials JOIN ceny_zakres ON materials.id = ceny_zakres.id_item ";
+										//$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
+										$sql.="WHERE materials.id='$_GET[papierw]' AND ";
+										$sql.="$cardboard<=price_range ORDER BY price_range";
+										//$sql.="szt_od<='".$_GET[liczba]."' AND szt_do='0') ";
+										$sql.=" LIMIT 0,1";
+										list($id_material,$name, $price_range, $price)=mysql_fetch_row(mysql_query($sql));
+										if($id_material){
+											
 											echo "<pre>";
 											echo "<span class='label label-success'>";
-											SL("paper_format",$_GET[pricing_lang]);
-											echo "</span>&nbsp;<strong>";
-											echo $papier_wklejka_x." x ".$papier_wklejka_y."</strong><br/>";
+											//SL("print_type",$_GET[pricing_lang]);
+											echo 'Papier m2';
+											echo ": </span>&nbsp;<strong>";
+											echo $cardboard;
+											//if($cena>0){echo $cena." ".$waluta." ";}
+											//if($cena_szt>0){echo "+ ".$cena_szt." ".$waluta."/szt. ".$cena_typ;}
+											echo "</strong>&nbsp;";
 											echo "<span class='label label-success'>";
-											SL("price",$_GET[pricing_lang]);
-											echo ": </span>&nbsp;<strong>&nbsp;";
-											echo $grubosc_od."</strong><br/>";
-											echo "<span class='label label-success'>";
-											SL("utilities",$_GET[pricing_lang]);
-											echo ": </span>&nbsp;<strong>&nbsp;";
-											echo $sztuk_arkusz." ";
-											SL("items_per_sheet",$_GET[pricing_lang]);
+											//SL("print_type",$_GET[pricing_lang]);
+											echo 'Cena za m2';
+											echo ": </span>&nbsp;<strong>";
+											echo "PLN ".number_format($price, 3);
+											//if($cena>0){echo $cena." ".$waluta." ";}
+											//if($cena_szt>0){echo "+ ".$cena_szt." ".$waluta."/szt. ".$cena_typ;}
 											echo "</strong>";
 											echo "</pre>";
 										}else{?>
-												<span class='label label-important'><?SL("no_out_sticker_print_format",$_GET[pricing_lang]);?></span>
-												<a target='_blank' class='btn btn-mini btn-primary' role='button' href='wyceny_formaty_wklejka.php?typ=$_GET[typ]&add=1'><?SL("out_sticker_paper",$_GET[pricing_lang]);?>Add new in-sticker format</a>
+												<span class='label label-important'><?SL("no_in_sticker_paper",$_GET[pricing_lang]);?></span>
+												
 										<?}
 									}
 									?>
@@ -1043,7 +1061,8 @@ $_KURS=$_GET[kurs];
 									<legend><?SL("out_sticker_foiling",$_GET[pricing_lang]);?></legend>
 									<label class="inline"><?SL("foiling_type",$_GET[pricing_lang]);?>&nbsp;
 									<?
-										$sql="SELECT id as typ_foli_oklejka,nazwa".$_GET[pricing_lang]." as nazwa FROM folie WHERE del='0'";
+										//$sql="SELECT id as typ_foli_oklejka,nazwa".$_GET[pricing_lang]." as nazwa FROM folie WHERE del='0'";
+										$sql="SELECT DISTINCT id as id_material, name FROM materials WHERE typ='folia' ORDER BY id_material";
 										$res=mysql_query($sql);
 										?>
 										<select name="typ_foli_oklejka" onChange="document.forms['wycena'].action='#Folia_oklejka';document.forms['wycena'].submit()">
@@ -1051,8 +1070,8 @@ $_KURS=$_GET[kurs];
 										<?
 										while($dane=mysql_fetch_array($res)){
 											echo "<option ";
-											if($_GET[typ_foli_oklejka]==$dane[typ_foli_oklejka]){echo " selected ";}
-											echo " value='".$dane[typ_foli_oklejka]."'>".$dane[nazwa]."</option>";
+											if($_GET[typ_foli_oklejka]==$dane[id_material]){echo " selected ";}
+											echo " value='".$dane[id_material]."'>".$dane[name]."</option>";
 										}
 										?>
 										</select>
@@ -1371,7 +1390,7 @@ $_KURS=$_GET[kurs];
 							</div>
 							<?
 							}
-							if($id_format && $_GET[nazwa_klienta] && $_GET[nazwa_zlecenia] && $_GET[liczba] && !$_GET['print']){
+							if($cardboard && $_GET[nazwa_klienta] && $_GET[nazwa_zlecenia] && $_GET[liczba] && !$_GET['print']){
 							?>
 							<div class="row-fluid">
 								<div class="span12">
