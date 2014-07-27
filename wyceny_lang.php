@@ -148,6 +148,8 @@ $_TRAN["_pl"]["number_in_box"]="Sztuk w pudełku";
 $_TRAN["_en"]["no_mechanisms"]="No mechanisms";
 $_TRAN["_pl"]["no_mechanisms"]="Produkt bez mechanizmów";
 
+$_TRAN["_en"]["coating"]="Coating";
+$_TRAN["_pl"]["coating"]="Kaszerowanie";
 $_TRAN["_en"]["fixed_parts"]="Fixed parts";
 $_TRAN["_pl"]["fixed_parts"]="Części stałe";
 $_TRAN["_en"]["more_parts"]="More parts";
