@@ -727,7 +727,11 @@ $_KURS=$_GET[kurs];
 											//if($cena>0){echo $cena." ".$waluta." ";}
 											//if($cena_szt>0){echo "+ ".$cena_szt." ".$waluta."/szt. ".$cena_typ;}
 											echo "</strong>&nbsp;";
-											
+											if(!$_GET[kaszerowane]=="1")
+											echo "+Kaszerowanie <input type=\"checkbox\" name=\"kaszerowane\" value=\"1\" onClick=\"document.forms['wycena'].action='#Parametry_wyceny';document.forms['wycena'].submit()\"/>";
+											else {
+												echo "+Kaszerowanie <input type=\"checkbox\" name=\"kaszerowane\" checked value=\"1\" onClick=\"document.forms['wycena'].action='#Parametry_wyceny';document.forms['wycena'].submit()\"/>";
+											}
 											echo "</pre>";
 										}else{?>
 												<span class='label label-important'><?SL("no_out_sticker_print_format",$_GET[pricing_lang]);?></span>
