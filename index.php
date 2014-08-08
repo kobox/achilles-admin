@@ -320,7 +320,12 @@ if (($_GET[site] == 'zaloguj') || ($_GET[site] == 'wyloguj')) {
 			echo '</div><!--/span-->
 				</div><!--/row-->';
 			include "wyceny_cbox.php";
-			break;	
+			break;
+		case "wyceny_tektura":
+			echo '</div><!--/span-->
+				</div><!--/row-->';
+			include "wyceny_tektura.php";
+			break;
 		case "pricing_list":
 			echo '</div><!--/span-->
 				</div><!--/row-->';
