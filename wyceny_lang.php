@@ -65,6 +65,8 @@ $_TRAN["_en"]["in_sticker_paper"]="In-sticker paper";
 $_TRAN["_pl"]["in_sticker_paper"]="Papier wklejki";
 $_TRAN["_en"]["no_in_sticker_paper"]="without in-sticker paper";
 $_TRAN["_pl"]["no_in_sticker_paper"]="bez wklejki";
+$_TRAN["_en"]["no_price"]="No price found";
+$_TRAN["_pl"]["no_price"]="Brak cennika";
 
 $_TRAN["_en"]["out_sticker_print"]="Out-sticker print";
 $_TRAN["_pl"]["out_sticker_print"]="Druk oklejka";

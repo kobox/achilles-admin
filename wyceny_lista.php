@@ -156,16 +156,17 @@ if($_GET[del_id]){
 												<td nowrap="1"><a href="?site=<?=$_GET[site]?>&set_wprow=<?=$dane[wprow]?>" title="<?=$_USERS_LIST[$dane[wprow]];?>"><?=$_USERS_LIST_IMIE[$dane[wprow]];?></a></td>
 												<td nowrap="1"><?echo ($dane[data_wprow]!="0000-00-00 00:00:00"?$dane[data_wprow_s]:"");?></td>												
 												<td nowrap="1">
-													<?if($_SESSION['user_id']==$dane[wprow] && $dane[linkp]=='pricing_cbox'){?>
-													<a class="btn btn-mini btn-danger" href="?site=pricing_cbox&action=new&wycena_id=<?=$dane[id]?>">Edit</a>
-													<?}
-elseif ($_SESSION['user_id']==$dane[wprow]) {?>
-	<a class="btn btn-mini btn-danger" href="?site=pricing&action=new&wycena_id=<?=$dane[id]?>">Edit</a>
-<?}
+													<?
+													if (!$dane[linkp]) $dane[linkp]='pricing';
+													if($_SESSION['user_id']==$dane[wprow]){
 													
 													?>
-													<a class="btn btn-mini btn-info" href="?site=pricing&action=new&przelicz=1&show_wycena_id=<?=$dane[id];?>">Show</a>
-													<a class="btn btn-mini btn-warning" href="?site=pricing&action=new&przelicz=1&show_wycena_id=<?=$dane[id];?>&print=1" target="_blank">Print</a>
+													<a class="btn btn-mini btn-danger" href="?site=<?=$dane[linkp];?>&action=new&wycena_id=<?=$dane[id];?>">Edit</a>
+													<?}
+										
+													?>
+													<a class="btn btn-mini btn-info" href="?site=<?=$dane[linkp];?>&action=new&przelicz=1&show_wycena_id=<?=$dane[id];?>">Show</a>
+													<a class="btn btn-mini btn-warning" href="?site=<?=$dane[linkp];?>&action=new&przelicz=1&show_wycena_id=<?=$dane[id];?>&print=1" target="_blank">Print</a>
 													<?if($_SESSION[pricing] == 'full'){?>
 														<a href='?site=pricing_list&p=<?=$_GET[p]?>&del_id=<?=$dane[id];?>&set_wprow=<?=$_GET[set_wprow]?>&set_klient=<?=$_GET[set_klient]?>&sort=<?=$_GET[sort]?>&sortt=<?=$_GET[sortt]?>' onClick="if(confirm('Do you want to delete valuation?')){return true;}else{return false;}"><i class='icon-trash'></i>delete</a>
 													<?}?>

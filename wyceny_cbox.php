@@ -89,7 +89,9 @@ $_KURS=$_GET[kurs];
 				<?
 				$cardboard = round(($_GET[format_x] * $_GET[format_y])/1000000 * $_GET[liczba],3);
 				//$cardboard = floor($cardboard * 100) / 100;
-				$cardboard = ceil($cardboard);	
+				$cardboard = ceil($cardboard);
+				//$b0 = FALSE;
+				$b0 = !(($_GET[format_x] <= 1000 || $_GET[format_y] <=1000) && ($_GET[format_x] <= 700 || $_GET[format_y] <=700));
 				$sql="SELECT materials.id, name, price_range, price FROM materials JOIN ceny_zakres ON materials.id = ceny_zakres.id_item ";
 										//$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
 										$sql.="WHERE materials.id='$_GET[tektura]' AND ";
@@ -224,6 +226,7 @@ $_KURS=$_GET[kurs];
 						echo " (";
 						SL("print_type",$_GET[pricing_lang]);
 						echo "&nbsp;".$_GET[druk_typ_oklejka].")";
+						if ($b0 === FALSE) {
 						$sql="SELECT id as id_druk_oklejka,cena,cena_szt,cena_typ,waluta,szt_od,szt_do FROM druk_oklejka ";
 						//$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
 						$sql.="WHERE typ=12 AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
@@ -246,6 +249,23 @@ $_KURS=$_GET[kurs];
 							if($szt_do==0 || $szt_do > $_GET[liczba])$szt_do=$szt_od;
 							$_koszt_pln[4]+=round(($_GET[liczba]-$szt_do)*($cena_szt*$_KURS["pln/$waluta"]),2);
 							$_koszt_eur[4]+=round(($_GET[liczba]-$szt_do)*($cena_szt*$_KURS["eur/$waluta"]),2);
+						}
+						}else //arkusz B0
+						{
+							$sql="SELECT print_type, price_range, price, currency FROM druk_zakres ";
+										//$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
+										$sql.="WHERE print_type='$_GET[druk_typ_oklejka]' AND ";
+										$sql.="$_GET[liczba]<=price_range ORDER BY price_range";
+										//$sql.="szt_od<='".$_GET[liczba]."' AND szt_do='0') ";
+										$sql.=" LIMIT 0,1";
+										list($print_type,$price_range, $price, $currency)=mysql_fetch_row(mysql_query($sql));
+							if ($print_type){
+							$_koszt_pln[4]=round($price*$_GET[liczba]*$_KURS["pln/$currency"],3);
+							$_koszt_eur[4]=round($price*$_GET[liczba]*$_KURS["eur/$currency"],3);
+								}	else{
+							$_koszt_pln[4]=0;
+							$_koszt_eur[4]=0;
+								}	
 						}
 						?>
 						</td><td><?=$_koszt_eur[4];?></td><td><?=round($_koszt_eur[4]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[4];?></td><td><?=round($_koszt_pln[4]/$_GET[liczba],2);?></td></tr>
@@ -661,7 +681,7 @@ $_KURS=$_GET[kurs];
 						echo mysql_error()." <br>".$sql;
 					}
 				}elseif(!$_GET[show_wycena_id]){
-					$sql="INSERT INTO wyceny (nazwa_klienta,nazwa_zlecenia,szt,koszt_calkowity_eur,koszt_szt_eur,koszt_calkowity_pln,koszt_szt_pln,kurs_eur,parametry,wprow,linkp,data_wprow) VALUES ('".$_GET[nazwa_klienta]."','".$_GET[nazwa_zlecenia]."','".$_GET[liczba]."','".round($SUMA_EUR,2)."','".round($SUMA_EUR/$_GET[liczba],2)."','".round($SUMA_PLN,2)."','".round($SUMA_PLN/$_GET[liczba],2)."','".$_KURS["pln/eur"]."','".serialize($_GET)."','".$_SESSION['user_id']."',linkp='pricing_cbox',NOW())";
+					$sql="INSERT INTO wyceny (nazwa_klienta,nazwa_zlecenia,szt,koszt_calkowity_eur,koszt_szt_eur,koszt_calkowity_pln,koszt_szt_pln,kurs_eur,parametry,wprow,linkp,data_wprow) VALUES ('".$_GET[nazwa_klienta]."','".$_GET[nazwa_zlecenia]."','".$_GET[liczba]."','".round($SUMA_EUR,2)."','".round($SUMA_EUR/$_GET[liczba],2)."','".round($SUMA_PLN,2)."','".round($SUMA_PLN/$_GET[liczba],2)."','".$_KURS["pln/eur"]."','".serialize($_GET)."','".$_SESSION['user_id']."','pricing_cbox',NOW())";
 					if(mysql_query($sql)){
 						$sql="SELECT MAX(id) FROM wyceny WHERE nazwa_klienta='".$_GET[nazwa_klienta]."' AND nazwa_zlecenia='".$_GET[nazwa_zlecenia]."' AND szt='".$_GET[liczba]."' AND koszt_calkowity_eur='".round($SUMA_EUR,2)."'";
 						list($wycena_id)=mysql_fetch_row(mysql_query($sql));
@@ -1053,7 +1073,10 @@ $_KURS=$_GET[kurs];
 									</select>
 									</label>
 									<?
+									
 									if($_GET[druk_typ_oklejka]){
+										$b0 =!(($_GET[format_x] <= 1000 || $_GET[format_y] <=1000) && ($_GET[format_x] <= 700 || $_GET[format_y] <=700));
+										if ($b0 === FALSE) {
 										$sql="SELECT id as id_druk_oklejka,cena,cena_szt,cena_typ,waluta FROM druk_oklejka ";
 										//$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
 										$sql.="WHERE typ=12 AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
@@ -1074,12 +1097,42 @@ $_KURS=$_GET[kurs];
 										}else{?>
 												<span class='label label-important'><?SL("no_out_sticker_print_format",$_GET[pricing_lang]);?></span>
 												<a target='_blank' class='btn btn-mini btn-primary' role='button' href='wyceny_druk_oklejka.php?add=1'><?SL("add_new_out_sticker_print_type",$_GET[pricing_lang]);?></a>
-										<?}
-									}else{
+										<?} 
+									}else{ //B0
+										
+										$sql="SELECT print_type, price_range, price, currency FROM druk_zakres ";
+										//$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
+										$sql.="WHERE print_type='$_GET[druk_typ_oklejka]' AND ";
+										$sql.="$_GET[liczba]<=price_range ORDER BY price_range";
+										//$sql.="szt_od<='".$_GET[liczba]."' AND szt_do='0') ";
+										$sql.=" LIMIT 0,1";
+										list($print_type,$price_range, $price, $currency)=mysql_fetch_row(mysql_query($sql));
+										if ($print_type){
+											echo "<pre>";
+											echo "<span class='label label-success'>";
+											SL("print_type",$_GET[pricing_lang]);
+											echo ": </span>&nbsp;<strong>";
+											echo $_GET[druk_typ_oklejka]." ";
+											echo "<span class='label label-success'>";
+											//SL("print_type",$_GET[pricing_lang]);
+											echo 'Koszt';
+											echo ": </span>&nbsp;";
+											echo "PLN ".number_format($price*$_GET[liczba], 2);
+											echo "</strong>&nbsp;";
+											//if($cena_szt>0){echo "+ ".$cena_szt." ".$waluta."/szt. ".$cena_typ;}
+											echo "</strong>";
+											echo "</pre>";
+											} else {
+												echo "<span class='label label-warning'>";
+										SL("no_price",$_GET[pricing_lang]);
+										echo "</span>";
+											}
+									}}else{
 										echo "<span class='label label-warning'>";
 										SL("product_without_out_sticker_print",$_GET[pricing_lang]);
 										echo "</span>";
 									}
+									
 									?>
 								</div>
 								<div class="span6">
