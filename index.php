@@ -15,14 +15,7 @@ if($_GET[typ]){
 
     <!-- Le styles -->
     <link href="css/bootstrap.css" rel="stylesheet">	
-    <script type="text/javascript">
- <!--
-   function popup(url) 
-   {
-     window.open(url,'','width=800,height=600,scrollbars=yes,menubar=no');
-   }
- //-->
- </script>
+    
     <link href="css/bootstrap-responsive.css" rel="stylesheet">
 	
 
@@ -49,7 +42,8 @@ if($_GET[typ]){
 	<script src="../js/libs/ui.selectmenu.js"></script>
 	<script src="../js/script.js"></script>
 	<link href="css/bootstrap.css" rel="stylesheet">	
-
+    <link href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.2/css/bootstrap-select.min.css" rel="stylesheet">
+    
     <style type="text/css">
       body {
         padding-top: 30px;
@@ -446,7 +440,21 @@ if (($_GET[site] == 'zaloguj') || ($_GET[site] == 'wyloguj')) {
     <script src="js/bootstrap-collapse.js"></script>
     <script src="js/bootstrap-carousel.js"></script>
     <script src="js/bootstrap-typeahead.js"></script>
-
+    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.2/js/bootstrap-select.min.js"></script>
+<script type="text/javascript">
+ //<!--
+   $(document).ready(function(){ 
+            $('.selectpicker').selectpicker({
+    style: 'btn-info',
+    size: 3
+    });
+   }); 
+   function popup(url) 
+   {
+     window.open(url,'','width=800,height=600,scrollbars=yes,menubar=no');
+   }
+ //-->
+ </script>
   </body>
 </html>
 <?php

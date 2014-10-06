@@ -90,7 +90,8 @@ $_KURS=$_GET[kurs];
 				$cardboard = round(($_GET[format_x] * $_GET[format_y])/1000000 * $_GET[liczba],3);
 				//$cardboard = floor($cardboard * 100) / 100;
 				$cardboard = ceil($cardboard);
-				//$b0 = FALSE;
+                $sheets = round($_GET[liczba]/$_GET[sheetitems]);
+                				//$b0 = FALSE;
 				$b0 = !(($_GET[format_x] <= 1000 || $_GET[format_y] <=1000) && ($_GET[format_x] <= 700 || $_GET[format_y] <=700));
 				$sql="SELECT materials.id, name, price_range, price FROM materials JOIN ceny_zakres ON materials.id = ceny_zakres.id_item ";
 										//$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
@@ -112,6 +113,7 @@ $_KURS=$_GET[kurs];
 					//$sql.="AND del='0' ORDER BY prio ASC";
 					//list($id_format,$format_x_od,$format_x_do,$format_y_od,$format_y_do,$tektura_x,$tektura_y,$sztuk_arkusz)=mysql_fetch_row(mysql_query($sql));
 					SL("paperboard",$_GET[pricing_lang]);
+					echo " (Typ: ".$name." ) "; // nazwa tektury
 					//echo " (format: ".$tektura_x." x ".$tektura_y.",";
 					//SL("utilities",$_GET[pricing_lang]);
 					//echo ": ".$sztuk_arkusz."&nbsp;";
@@ -163,7 +165,7 @@ $_KURS=$_GET[kurs];
 					//$_koszt_eur[2]=round((($cardboard*$gsm)/1000*(($_CONF["cena_papier_tona"][$_GET[typ]]*$_KURS["eur/".$_CONF[waluta_papier_tona][$_GET[typ]]])/1000)),2);
 					$_koszt_pln[2] = round($cardboard*$price*$_KURS["pln/$currency"],2);
 					$_koszt_eur[2] = round($cardboard*$price*$_KURS["eur/$currency"],2);
-					$SUMA_PLN+=$_koszt_pln[2];
+                    $SUMA_PLN+=$_koszt_pln[2];
 					$SUMA_EUR+=$_koszt_eur[2];
 				?>
 					</td><td><?=$_koszt_eur[2];?></td><td><?=round($_koszt_eur[2]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[2];?></td><td><?=round($_koszt_pln[2]/$_GET[liczba],2);?></td></tr>
@@ -258,10 +260,17 @@ $_KURS=$_GET[kurs];
 										$sql.="$_GET[liczba]<=price_range ORDER BY price_range";
 										//$sql.="szt_od<='".$_GET[liczba]."' AND szt_do='0') ";
 										$sql.=" LIMIT 0,1";
-										list($print_type,$price_range, $price, $currency)=mysql_fetch_row(mysql_query($sql));
-							if ($print_type){
-							$_koszt_pln[4]=round($price*$_GET[liczba]*$_KURS["pln/$currency"],3);
-							$_koszt_eur[4]=round($price*$_GET[liczba]*$_KURS["eur/$currency"],3);
+							list($print_type,$price_range, $price, $currency)=mysql_fetch_row(mysql_query($sql));
+							if ($print_type) { //zaznaczony typ druku - print type selected
+							$transport = 200;
+                            $transport = ($_GET[liczba] >= 2500) ? 400 : $transport;
+                            $transport = ($_GET[liczba] >= 5000) ? 600 : $transport;
+                            $transport = ($_GET[liczba] >= 7000) ? 800 : $transport;
+                            $transport = ($_GET[liczba] >= 9000) ? 1000 : $transport;
+                            $transport_eur = $transport*$_KURS["eur/pln"];
+                            echo "&nbsp; + ".$transport."PLN";	
+							$_koszt_pln[4]=round($transport+$price*$_GET[liczba]*$_KURS["pln/$currency"],3);
+							$_koszt_eur[4]=round($transport_eur+$price*$_GET[liczba]*$_KURS["eur/$currency"],3);
 								}	else{
 							$_koszt_pln[4]=0;
 							$_koszt_eur[4]=0;
@@ -323,7 +332,8 @@ $_KURS=$_GET[kurs];
 				<tr><td>6</td><td>
 				<?
 				SL("out_sticker_foiling",$_GET[pricing_lang]);
-				if($_GET[typ_foli_oklejka] && $_GET[papiero]){
+				//if($_GET[typ_foli_oklejka] && $_GET[papiero]){
+				    if($_GET[typ_foli_oklejka]) {
 					$sql="SELECT nazwa".$_GET[pricing_lang]." as nazwa FROM folie WHERE id='".$_GET[typ_foli_oklejka]."'";
 					list($nazwa_folia_oklejka)=mysql_fetch_row(mysql_query($sql));
 					echo " (";
@@ -526,9 +536,9 @@ $_KURS=$_GET[kurs];
 							$sql.=" LIMIT 0,1";
 							list($id_material,$name, $price_range, $price, $gsm, $waluta)=mysql_fetch_row(mysql_query($sql));
 							
-							$_koszt_pln[10]=round($_GET[liczba]*$price*$_KURS["pln/".$waluta],2);
+							$_koszt_pln[10]=round($cardboard*$price*$_KURS["pln/".$waluta],2);
 							
-							$_koszt_eur[10]=round($_GET[liczba]*$price*$_KURS["eur/".$waluta],2);
+							$_koszt_eur[10]=round($cardboard*$price*$_KURS["eur/".$waluta],2);
 							$SUMA_PLN+=$_koszt_pln[10];
 							$SUMA_EUR+=$_koszt_eur[10];
 							?>
@@ -542,6 +552,31 @@ $_KURS=$_GET[kurs];
 					</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
 					<?
 				}
+				if($_GET[kaszerowanie]){
+				    $counter = sizeof($_GET[kaszerowanie]);
+                ?>
+                    <tr class="warning"><td>10</td><td>
+                    <?SL("coating",$_GET[pricing_lang]); ?></td>
+                    <? 
+                        $sql="SELECT materials.id, name, price_range, price, gsm, currency FROM materials JOIN ceny_zakres ON materials.id = ceny_zakres.id_item ";
+                            //$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
+                            $sql.="WHERE materials.id=10 AND ";
+                            $sql.="$cardboard<=price_range ORDER BY price_range";
+                            //$sql.="szt_od<='".$_GET[liczba]."' AND szt_do='0') ";
+                            $sql.=" LIMIT 0,1";
+                            list($id_material,$name, $price_range, $price, $gsm, $waluta)=mysql_fetch_row(mysql_query($sql));
+                            
+                            $_koszt_pln[10]=round($cardboard*$price*$_KURS["pln/".$waluta],2)*$counter;
+                            $_koszt_eur[10]=round($cardboard*$price*$_KURS["eur/".$waluta],2)*$counter;
+                            $SUMA_PLN+=$_koszt_pln[10];
+                            $SUMA_EUR+=$_koszt_eur[10];
+                            ?>
+                            </td><td><?=$_koszt_eur[10];?></td><td><?=round($_koszt_eur[10]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[10];?></td><td><?=round($_koszt_pln[10]/$_GET[liczba],2);?></td></tr>
+                            <?
+                        
+                                                        
+                }
+				
 				if($_GET[id_element]){
 				?>
 					<tr class="warning"><td>11</td><td colspan="5"><?SL("fixed_parts",$_GET[pricing_lang]);?></td></tr>
@@ -774,6 +809,7 @@ $_KURS=$_GET[kurs];
 									?>
 									</select>
 									</label>
+									
 									<?
 									if($_GET[tektura]){
 										$sql="SELECT materials.id, name, price_range, price FROM materials JOIN ceny_zakres ON materials.id = ceny_zakres.id_item ";
@@ -846,6 +882,40 @@ $_KURS=$_GET[kurs];
 												<input name="format_y" value="<?=$_GET[format_y]?>" type="text" class="input-mini" autocomplete="off">
 											<?
 											}?>
+											
+  <br/>Arkusze i użytki:
+  <label class="radio-inline" style="display: inline;">
+    <input type="radio" name="sheetsize" id="ob0" value="B0" <?if ($_GET[sheetsize]==='B0') echo checked;?> onChange="document.forms['wycena'].action='#Druk_oklejka';document.forms['wycena'].submit();">
+    B0
+    </label>
+
+  <label class="radio-inline" style="display: inline;">
+    <input type="radio" name="sheetsize" id="ob1" value="B1" <?if ($_GET[sheetsize]==='B1') echo checked;?> onChange="document.forms['wycena'].action='#Druk_oklejka';document.forms['wycena'].submit();">
+   B1
+  </label>
+  <label class="radio-inline" style="display: inline;">
+       <input type="radio" name="sheetsize" id="ob2" value="B2" <?if ($_GET[sheetsize]==='B2') echo checked;?> onChange="document.forms['wycena'].action='#Druk_oklejka';document.forms['wycena'].submit();">
+   B2
+  </label>
+  / Ilość użytków <input name="sheetitems" value="<?=$_GET[sheetitems]?>" type="text" class="input-mini" autocomplete="off">&nbsp;
+  <label class="inline"><?SL("cardboard_type",$_GET[pricing_lang]);?>&nbsp;
+                                    <?
+                                    //$sql="SELECT DISTINCT druk_typ as druk_typ_oklejka FROM druk_oklejka WHERE typ='$_GET[typ]' AND del='0' ORDER BY druk_typ";
+                                    $sql="SELECT DISTINCT id as id_drukarnia, name FROM drukarnie  ORDER BY id_drukarnia";
+                                    $res=mysql_query($sql);
+                                    ?>
+                                    <select name="drukarnia" onChange="document.forms['wycena'].action='#Druk_oklejka';document.forms['wycena'].submit()">
+                                    <option value="">-- <?SL("select",$_GET[pricing_lang]);?> --</option>
+                                    <?
+                                    while($dane=mysql_fetch_array($res)){
+                                        echo "<option ";
+                                        if($_GET[drukarnia]==$dane[id_drukarnia]){echo " selected ";}
+                                        echo " value='".$dane[id_drukarnia]."'>".$dane[name]."</option>";
+                                    } 
+                                    ?>
+                                    </select>
+                                    </label>
+
 											<input type="hidden" name="ile_tektur" value="<?=$_GET[ile_tektur]?>">
 											<input type="hidden" name="wczytaj" value="1">
 											<input type="hidden" name="typ_old" value="<?=$_GET[typ]?>">
@@ -856,7 +926,8 @@ $_KURS=$_GET[kurs];
 											{
 											$cardboard = round(($_GET[format_x] * $_GET[format_y])/1000000 * $_GET[liczba],3);
 											//$cardboard = floor($cardboard * 100) / 100;
-											$cardboard = ceil($cardboard);	
+											$cardboard = ceil($cardboard);
+                                            $sheets = round($_GET[liczba]/$_GET[sheetitems]);
 									    $sql="SELECT materials.id, name, price_range, price FROM materials JOIN ceny_zakres ON materials.id = ceny_zakres.id_item ";
 										//$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
 										$sql.="WHERE materials.id='$_GET[tektura]' AND ";
@@ -880,6 +951,7 @@ $_KURS=$_GET[kurs];
 											echo 'Cena za m2';
 											echo ": </span>&nbsp;<strong>";
 											echo "PLN ".number_format($price, 3);
+                                            
 											//if($cena>0){echo $cena." ".$waluta." ";}
 											//if($cena_szt>0){echo "+ ".$cena_szt." ".$waluta."/szt. ".$cena_typ;}
 											echo "</strong>";
@@ -1462,8 +1534,9 @@ $_KURS=$_GET[kurs];
 									?>
 								</div>
 							</div> 
-							<a name="mechanizmy"></a>
+							<a name="wykrojnik"></a>
 							
+							     
 							<div class="row-fluid">
 								<div class="span6">
 									<a name="Dodatki"></a>
