@@ -382,6 +382,11 @@ if (($_GET[site] == 'zaloguj') || ($_GET[site] == 'wyloguj')) {
 				</div><!--/row-->';
 			include "wyceny_druk_wklejka.php";
 			break;
+        case "wyceny_druk_arkusze":
+            echo '</div><!--/span-->
+                </div><!--/row-->';
+            include "wyceny_druk_arkusze.php";
+            break;
 		case "wyceny_mechanizmy":
 			echo '</div><!--/span-->
 				</div><!--/row-->';
