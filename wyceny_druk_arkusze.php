@@ -119,6 +119,16 @@ if($_GET[del_id]){
 						<div class="span12">
 						<form name="wycena">
 						<input type="hidden" name="site" value="<?=$_GET[site]?>">
+						<fieldset>
+                            <div class="row-fluid">
+                                <div class="span12">
+                                    <legend>Druk wklejka&nbsp;&nbsp;&nbsp;
+                                    <?select_drukarnie();?>
+                                    <a class="btn btn-mini btn-primary" role="button" href="?site=<?=$_GET[site]?>&typ=<?=$_GET[typ]?>&add=1">Dodaj druk wklejki</a>
+                                    </legend>
+                                </div>
+                            </div>
+                            </fieldset>
 							<fieldset>
 							<div class="row-fluid">
 								<div class="span12">

@@ -100,6 +100,39 @@ function select_typ($name="typ",$no_show="",$auto="1",$select_start="0"){
 <?
 }
 
+function select_drukarnie($name="typ",$no_show="",$auto="1",$select_start="0"){
+    //if(!$name)$name="typ";
+    ?>
+    <select name="<?=$name;?>" 
+    <?if($auto==1){?> onChange="document.forms['wycena'].submit()"<?}?> >
+    <?
+    if($select_start==1){
+        echo "<option value='' ";
+            if($_GET[typ]==""){echo " selected ";}
+            echo " value=''>--- wybierz ----</option>";
+    }
+    
+    //$sql="SELECT DISTINCT typ FROM format_tektura WHERE del='0' ORDER BY typ";
+    $sql="SELECT id, name, local FROM drukarnie WHERE del='0'";
+    if($no_show)$sql.=" AND id!='".$no_show."'";
+    $res=mysql_query($sql);
+        while($dane=mysql_fetch_array($res)){
+            if(!$_GET[typ]){
+                if($_SESSION['typ_wycena']){
+                    $_GET[typ]=$_SESSION['typ_wycena'];
+                }else{
+                    $_GET[typ]=$dane[typ];
+                }
+            }
+            echo "<option ";
+            if($_GET[typ]==$dane[id]){echo " selected ";}
+            echo " value='".$dane[id]."'>".$dane[name]." (".!$dane[local]." )</option>";
+        }
+    ?>
+    </select>
+<?
+}
+
 function copy_in_table($table,$typ_from,$typ_to,$id_copy=array()){
 	global $alert, $alert_ok;
 	$sql="SELECT * FROM $table WHERE typ=$typ_from";
