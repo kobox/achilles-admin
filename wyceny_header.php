@@ -133,6 +133,15 @@ function select_drukarnie($name="typ",$no_show="",$auto="1",$select_start="0"){
 <?
 }
 
+function count_transport($quantity="0"){
+$transport = 200;
+$transport = ($quantity >= 2500) ? 400 : $transport;
+$transport = ($quantity >= 5000) ? 600 : $transport;
+$transport = ($quantity >= 7000) ? 800 : $transport;
+$transport = ($quantity >= 9000) ? 1000 : $transport;
+return $transport;
+}
+
 function copy_in_table($table,$typ_from,$typ_to,$id_copy=array()){
 	global $alert, $alert_ok;
 	$sql="SELECT * FROM $table WHERE typ=$typ_from";
