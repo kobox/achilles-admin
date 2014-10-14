@@ -193,7 +193,8 @@ if (($_GET[site] == 'zaloguj') || ($_GET[site] == 'wyloguj')) {
 		"?site=wyceny_elementy"=>"Elementy stałe",
 		"?site=wyceny_dodatki"=>"Dodatkowe elementy",
 		"?site=wyceny_odpady"=>"Odpady",
-		"?site=wyceny_konfiguracja"=>"Konfiguracja");
+		"?site=wyceny_konfiguracja"=>"Konfiguracja",
+        "?site=wyceny_druk_arkusze"=>"Ceny Druku");
 		$file=str_replace("/admin/","",$_SERVER[PHP_SELF]);
 		
 		foreach($_MENU_SLOWNIKI as $key => $val){
