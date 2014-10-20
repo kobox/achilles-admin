@@ -3,7 +3,8 @@ if($_SERVER[SCRIPT_NAME]!="/admin/index.php"){
 	Header("Location: /admin/?site=".str_replace(array("/admin/",".php"),"",$_SERVER[SCRIPT_NAME]));
 	//echo "<hr>".str_replace(array("/admin/",".php"),"",$_SERVER[SCRIPT_NAME]);
 }
-
+require_once 'PhpWord/Autoloader.php';
+\PhpOffice\PhpWord\Autoloader::register();
 // baza
 $serwer = "localhost:3306";
 $user = "uszlachetnia_4";
@@ -140,6 +141,39 @@ $transport = ($quantity >= 5000) ? 600 : $transport;
 $transport = ($quantity >= 7000) ? 800 : $transport;
 $transport = ($quantity >= 9000) ? 1000 : $transport;
 return $transport;
+}
+/**
+ * Kalkulacja Kosztu druku - standard
+ */
+function calculate_print($print_type, $sheetsize, $sheets, $printhouse){
+    $sql="SELECT id_printhouse, print_type, sheetsize, price_range, price, currency, name, local, standard FROM druk_zakres JOIN drukarnie ON id_printhouse = drukarnie.id ";
+    //$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
+    $sql.="WHERE print_type='$print_type' AND ";
+    $sql.="sheetsize ='$sheetsize' AND id_printhouse='$printhouse' AND ";
+    $sql.="$sheets<=price_range ORDER BY price_range";
+    //$sql.="szt_od<='".$_GET[liczba]."' AND szt_do='0') ";
+    $sql.=" LIMIT 0,1";
+    $result=list($id, $print_type, $sheetsize, $price_range, $price, $currency, $name, $local, $standard)=mysql_fetch_row(mysql_query($sql));
+    $cost =number_format($price*$sheets, 3);
+    return array('print_type' => $print_type, 'name' => $name, 'cost'=>$cost);
+}
+
+/**
+ * Kalkulacja Kosztu druku - niestandardowo
+ */
+function calculate_toolprint($print_type, $sheetsize, $sheets, $printhouse){
+    $sql="SELECT id_printhouse, print_type, sheetsize, price_range, base_price, base_include, add_price, currency, name, local, standard FROM druk_narzedzie JOIN drukarnie ON id_printhouse = drukarnie.id ";
+    //$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
+    $sql.="WHERE print_type='$print_type' AND ";
+    $sql.="sheetsize ='$sheetsize' AND id_printhouse='$printhouse' AND ";
+    $sql.="$sheets<=price_range ORDER BY price_range";
+    //$sql.="szt_od<='".$_GET[liczba]."' AND szt_do='0') ";
+    $sql.=" LIMIT 0,1";
+    $result=list($id, $print_type, $sheetsize, $price_range, $base_price, $base_include, $add_price, $currency, $name, $local, $standard)=mysql_fetch_row(mysql_query($sql));
+    
+    $cost = $base_price + ($sheets -$base_include) * $add_price;
+    //$cost = number_format($price*$sheets, 3);
+    return array('print_type' => $print_type, 'name' => $name, 'cost'=>$cost);
 }
 
 function copy_in_table($table,$typ_from,$typ_to,$id_copy=array()){

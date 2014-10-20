@@ -255,15 +255,15 @@ $_KURS=$_GET[kurs];
 						}
 						}else //arkusz B0
 						{
-						   $sql="SELECT id_printhouse, print_type, sheetsize, price_range, price, currency, name, local FROM druk_zakres JOIN drukarnie ON id_printhouse = drukarnie.id ";
+						   $sql="SELECT id_printhouse, print_type, sheetsize, price_range, price, currency, name, local, standard FROM druk_zakres JOIN drukarnie ON id_printhouse = drukarnie.id ";
                            //$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
                            $sql.="WHERE print_type='$_GET[druk_typ_oklejka]' AND ";
                            $sql.="sheetsize ='$_GET[sheetsize]' AND id_printhouse='$_GET[drukarnia]' AND ";
                            $sql.="$sheets<=price_range ORDER BY price_range";
                            //$sql.="szt_od<='".$_GET[liczba]."' AND szt_do='0') ";
                            $sql.=" LIMIT 0,1";
-                           list($id, $print_type, $sheetsize, $price_range, $price, $currency, $name, $local)=mysql_fetch_row(mysql_query($sql));
-							if ($print_type) { //zaznaczony typ druku - print type selected
+                           list($id, $print_type, $sheetsize, $price_range, $price, $currency, $name, $local, $standard)=mysql_fetch_row(mysql_query($sql));
+							if ($print_type) { //zaznaczony typ druku - print type is selected
 							if ($local==="0") $transport = count_transport($sheets); else $transport=0;
                             $transport_eur = $transport*$_KURS["eur/pln"];
                             echo "&nbsp; + ".$transport."PLN";	
@@ -553,18 +553,18 @@ $_KURS=$_GET[kurs];
                     <?SL("coating",$_GET[pricing_lang]); ?></td>
                     <? 
                         $sql="SELECT materials.id, name, price_range, price, gsm, currency FROM materials JOIN ceny_zakres ON materials.id = ceny_zakres.id_item ";
-                            //$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
-                            $sql.="WHERE materials.id=10 AND ";
-                            $sql.="$cardboard<=price_range ORDER BY price_range";
-                            //$sql.="szt_od<='".$_GET[liczba]."' AND szt_do='0') ";
-                            $sql.=" LIMIT 0,1";
-                            list($id_material,$name, $price_range, $price, $gsm, $waluta)=mysql_fetch_row(mysql_query($sql));
+                        //$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
+                        $sql.="WHERE materials.id=10 AND ";
+                        $sql.="$cardboard<=price_range ORDER BY price_range";
+                        //$sql.="szt_od<='".$_GET[liczba]."' AND szt_do='0') ";
+                        $sql.=" LIMIT 0,1";
+                        list($id_material,$name, $price_range, $price, $gsm, $waluta)=mysql_fetch_row(mysql_query($sql));
                             
-                            $_koszt_pln[10]=round($cardboard*$price*$_KURS["pln/".$waluta],2)*$counter;
-                            $_koszt_eur[10]=round($cardboard*$price*$_KURS["eur/".$waluta],2)*$counter;
-                            $SUMA_PLN+=$_koszt_pln[10];
-                            $SUMA_EUR+=$_koszt_eur[10];
-                            ?>
+                        $_koszt_pln[10]=round($cardboard*$price*$_KURS["pln/".$waluta],2)*$counter;
+                        $_koszt_eur[10]=round($cardboard*$price*$_KURS["eur/".$waluta],2)*$counter;
+                        $SUMA_PLN+=$_koszt_pln[10];
+                        $SUMA_EUR+=$_koszt_eur[10];
+                        ?>
                             </td><td><?=$_koszt_eur[10];?></td><td><?=round($_koszt_eur[10]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[10];?></td><td><?=round($_koszt_pln[10]/$_GET[liczba],2);?></td></tr>
                             <?
                         
@@ -1143,49 +1143,54 @@ $_KURS=$_GET[kurs];
 									if($_GET[druk_typ_oklejka]){
 										//$b0 =!(($_GET[format_x] <= 1000 || $_GET[format_y] <=1000) && ($_GET[format_x] <= 700 || $_GET[format_y] <=700));
 										$b0 = TRUE;
-										if ($b0 === FALSE) {
-										$sql="SELECT id as id_druk_oklejka,cena,cena_szt,cena_typ,waluta FROM druk_oklejka ";
-										//$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
-										$sql.="WHERE typ=12 AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
-										$sql.="(szt_od<='".$_GET[liczba]."' AND szt_do>='".$_GET[liczba]."' OR ";
-										$sql.="szt_od<='".$_GET[liczba]."' AND szt_do='0') ";
-										$sql.="AND del='0'";
-										list($id_druk_oklejka,$cena,$cena_szt,$cena_typ,$waluta)=mysql_fetch_row(mysql_query($sql));
-										if($id_druk_oklejka){
-											echo "<pre>";
-											echo "<span class='label label-success'>";
-											SL("print_type",$_GET[pricing_lang]);
-											echo ": </span>&nbsp;<strong>";
-											echo $_GET[druk_typ_oklejka]." ";
-											if($cena>0){echo $cena." ".$waluta." ";}
-											if($cena_szt>0){echo "+ ".$cena_szt." ".$waluta."/szt. ".$cena_typ;}
-											echo "</strong>";
-											echo "</pre>";
-										}else{?>
-												<span class='label label-important'><?SL("no_out_sticker_print_format",$_GET[pricing_lang]);?></span>
-												<a target='_blank' class='btn btn-mini btn-primary' role='button' href='wyceny_druk_oklejka.php?add=1'><?SL("add_new_out_sticker_print_type",$_GET[pricing_lang]);?></a>
-										<?} 
+										$sql="SELECT * FROM drukarnie ";
+                                        //$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
+                                        $sql.="WHERE id='$_GET[drukarnia]'";
+                                        $sql.=" LIMIT 0,1";
+                                        list($id, $name, $local, $standard)=mysql_fetch_row(mysql_query($sql));
+										if ($standard == 0) {
+										$result = calculate_toolprint($_GET[druk_typ_oklejka], $_GET[sheetsize], $sheets, $_GET[drukarnia]);
+                                        if ($result['name']){
+                                            echo "<pre>";
+                                            echo "<span class='label label-success'>";
+                                            SL("print_type",$_GET[pricing_lang]);
+                                            echo ": </span>&nbsp;<strong>";
+                                            echo $result['print_type']." ";
+                                            echo "<span class='label label-success'>";
+                                            //SL("print_type",$_GET[pricing_lang]);
+                                            echo 'Koszt-'; echo $result['name'];
+                                            echo ": </span>&nbsp;";
+                                            echo "PLN ".$result['cost'];
+                                            echo "</strong>&nbsp;";
+                                            //if($cena_szt>0){echo "+ ".$cena_szt." ".$waluta."/szt. ".$cena_typ;}
+                                            echo "</strong>";
+                                            echo "</pre>";
+                                            } else {
+                                                echo "<span class='label label-warning'>";
+                                        SL("no_price",$_GET[pricing_lang]);
+                                        echo "</span>";
+                                            }
 									}else{ //B0
 										
-										$sql="SELECT id_printhouse, print_type, sheetsize, price_range, price, currency, name, local FROM druk_zakres JOIN drukarnie ON id_printhouse = drukarnie.id ";
-										//$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
-										$sql.="WHERE print_type='$_GET[druk_typ_oklejka]' AND ";
-										$sql.="sheetsize ='$_GET[sheetsize]' AND id_printhouse='$_GET[drukarnia]' AND ";
-										$sql.="$sheets<=price_range ORDER BY price_range";
+										//$sql="SELECT id_printhouse, print_type, sheetsize, price_range, price, currency, name, local, standard FROM druk_zakres JOIN drukarnie ON id_printhouse = drukarnie.id ";
+										//$sql.="WHERE print_type='$_GET[druk_typ_oklejka]' AND ";
+										//$sql.="sheetsize ='$_GET[sheetsize]' AND id_printhouse='$_GET[drukarnia]' AND ";
+										//$sql.="$sheets<=price_range ORDER BY price_range";
 										//$sql.="szt_od<='".$_GET[liczba]."' AND szt_do='0') ";
-										$sql.=" LIMIT 0,1";
-										list($id, $print_type, $sheetsize, $price_range, $price, $currency, $name)=mysql_fetch_row(mysql_query($sql));
-										if ($print_type){
+										//$sql.=" LIMIT 0,1";
+										//list($id, $print_type, $sheetsize, $price_range, $price, $currency, $name, $local, $standard)=mysql_fetch_row(mysql_query($sql));
+										$result = calculate_print($_GET[druk_typ_oklejka], $_GET[sheetsize], $sheets, $_GET[drukarnia]);
+										if ($result['name']){
 											echo "<pre>";
 											echo "<span class='label label-success'>";
 											SL("print_type",$_GET[pricing_lang]);
 											echo ": </span>&nbsp;<strong>";
-											echo $_GET[druk_typ_oklejka]." ";
+											echo $result['print_type']." ";
 											echo "<span class='label label-success'>";
 											//SL("print_type",$_GET[pricing_lang]);
-											echo 'Koszt-'; echo $name;
+											echo 'Koszt-'; echo $result['name'];
 											echo ": </span>&nbsp;";
-											echo "PLN ".number_format($price*$sheets, 2);
+											echo "PLN ".$result['cost'];
 											echo "</strong>&nbsp;";
 											//if($cena_szt>0){echo "+ ".$cena_szt." ".$waluta."/szt. ".$cena_typ;}
 											echo "</strong>";
@@ -1195,7 +1200,8 @@ $_KURS=$_GET[kurs];
 										SL("no_price",$_GET[pricing_lang]);
 										echo "</span>";
 											}
-									}}else{
+									     } //b0
+                                    }else{
 										echo "<span class='label label-warning'>";
 										SL("product_without_out_sticker_print",$_GET[pricing_lang]);
 										echo "</span>";
