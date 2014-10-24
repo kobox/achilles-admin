@@ -109,6 +109,10 @@ $_KURS=$_GET[kurs];
 					$_koszt_eur[1]=round(((($_GET[grubosc]*0.6)*($tektura_x/1000)*($tektura_y/1000)*(($_CONF["cena_tektura_tona"][$_GET[typ]]*$_KURS["eur/".$_CONF[waluta_tektura_tona][$_GET[typ]]])/1000))*$_GET[liczba])/$sztuk_arkusz,2);;
 					$SUMA_PLN=$_koszt_pln[1];
 					$SUMA_EUR=$_koszt_eur[1];
+                    $SUMMARY_PL[1]=$_GET[nazwa_klienta];
+                    $SUMMARY_PL[2]=$_GET[typ_nazwa];
+                    $SUMMARY_PL[6]=$_GET[format_x]." x ". $_GET[format_y]." mm";
+                    $SUMMARY_PL[8]=$_GET[liczba];
 				?>
 				</td><td><?=$_koszt_eur[1];?></td><td><?=round($_koszt_eur[1]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[1];?></td><td><?=round($_koszt_pln[1]/$_GET[liczba],2);?></td></tr>
 				<tr><td>2</td><td>
@@ -137,6 +141,7 @@ $_KURS=$_GET[kurs];
 					$_koszt_eur[2]=round(($_GET[liczba]*($grubosc_od/1000)*($papier_oklejka_x/1000)*($papier_oklejka_y/1000)*(($_CONF["cena_papier_tona"][$_GET[typ]]*$_KURS["eur/".$_CONF[waluta_papier_tona][$_GET[typ]]])/1000))/$sztuk_arkusz,2);
 					$SUMA_PLN+=$_koszt_pln[2];
 					$SUMA_EUR+=$_koszt_eur[2];
+                    
 				?>
 					</td><td><?=$_koszt_eur[2];?></td><td><?=round($_koszt_eur[2]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[2];?></td><td><?=round($_koszt_pln[2]/$_GET[liczba],2);?></td></tr>
 				<tr><td>3</td><td>
@@ -211,6 +216,7 @@ $_KURS=$_GET[kurs];
 						<?
 						$SUMA_PLN+=$_koszt_pln[4];
 						$SUMA_EUR+=$_koszt_eur[4];
+                        $SUMMARY_PL[3] = $_GET[druk_typ_oklejka].' , ';
 					}else{
 						?>
 						</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
@@ -252,6 +258,7 @@ $_KURS=$_GET[kurs];
 						<?
 						$SUMA_PLN+=$_koszt_pln[5];	
 						$SUMA_EUR+=$_koszt_eur[5];
+                        $SUMMARY_PL[4] = $_GET[druk_typ_wklejka].', ';
 					}else{
 						?>
 						</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
@@ -285,7 +292,7 @@ $_KURS=$_GET[kurs];
 						$_koszt_eur[6]=round(($_GET[liczba]*($cena*$_KURS["eur/$waluta"])*($folia_oklejka_x/1000)*($folia_oklejka_y/1000))/$sztuk_arkusz,2);
 						$SUMA_PLN+=$_koszt_pln[6];
 						$SUMA_EUR+=$_koszt_eur[6];
-
+                        $SUMMARY_PL[3] .= 'Folia '.$nazwa_folia_oklejka.', ';
 						?>
 						</td><td><?=$_koszt_eur[6];?></td><td><?=round($_koszt_eur[6]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[6];?></td><td><?=round($_koszt_pln[6]/$_GET[liczba],2);?></td></tr>
 						<?
@@ -326,6 +333,7 @@ $_KURS=$_GET[kurs];
 						$_koszt_eur[7]=round(($_GET[liczba]*($cena*$_KURS["eur/$waluta"])*($folia_wklejka_x/1000)*($folia_wklejka_y/1000))/$sztuk_arkusz,2);
 						$SUMA_PLN+=$_koszt_pln[7];
 						$SUMA_EUR+=$_koszt_eur[7];
+						$SUMMARY_PL[4] .= 'Folia '.$nazwa_folia_wklejka.', ';
 						?>
 						</td><td><?=$_koszt_eur[7];?></td><td><?=round($_koszt_eur[7]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[7];?></td><td><?=round($_koszt_pln[7]/$_GET[liczba],2);?></td></tr>
 						<?	
@@ -365,6 +373,7 @@ $_KURS=$_GET[kurs];
 					}
 					$SUMA_PLN+=$_koszt_pln[8];
 					$SUMA_EUR+=$_koszt_eur[8];
+                    $SUMMARY_PL[3] .= 'Lakier UV - '.$_GET[lakierowanie_typ_oklejka].', ';
 					?>
 					</td><td><?=$_koszt_eur[8];?></td><td><?=round($_koszt_eur[8]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[8];?></td><td><?=round($_koszt_pln[8]/$_GET[liczba],2);?></td></tr>
 				<?
@@ -404,6 +413,7 @@ $_KURS=$_GET[kurs];
 					}
 					$SUMA_PLN+=$_koszt_pln[9];
 					$SUMA_EUR+=$_koszt_eur[9];
+					$SUMMARY_PL[4] .= 'Lakier UV - '.$_GET[lakierowanie_typ_wklejka].', ';
 					?>
 					</td><td><?=$_koszt_eur[9];?></td><td><?=round($_koszt_eur[9]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[9];?></td><td><?=round($_koszt_pln[9]/$_GET[liczba],2);?></td></tr>
 					<?
@@ -431,7 +441,7 @@ $_KURS=$_GET[kurs];
 								echo ": ".$liczba_szt_pudlo.") ";
 								SL("price",$_GET[pricing_lang]);
 								echo ": ".$cena." ".$waluta.", ";
-								
+								$SUMMARY_PL[5] .= $nazwa." ".$typ_mechanizm.', ';
 								$liczba_nitow_all+=$liczba_nitow;
 								if($liczba_szt_pudlo>$liczba_w_opak)$liczba_w_opak=$liczba_szt_pudlo;
 							$_koszt_pln[10]=round($_GET[liczba]*$cena*$_KURS["pln/".$waluta],2);
@@ -505,6 +515,7 @@ $_KURS=$_GET[kurs];
 							}
 							$SUMA_PLN+=$_koszt_pln[12];
 							$SUMA_EUR+=$_koszt_eur[12];
+                            $SUMMARY_PL[7] .= $val.', ';
 							?>
 							</td><td><?=$_koszt_eur[12];?></td><td><?=round($_koszt_eur[12]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[12];?></td><td><?=round($_koszt_pln[12]/$_GET[liczba],2);?></td></tr>
 							<?
@@ -560,6 +571,7 @@ $_KURS=$_GET[kurs];
 				(szt_od<$_GET[liczba] AND szt_do>$_GET[liczba]) OR (szt_od<$_GET[liczba] AND szt_do=0)
 				AND typ='$_GET[typ]'";
 				list($cena_sugerowana)=mysql_fetch_row(mysql_query($sql));
+                $SUMMARY_PL[9]=round(($SUMA_PLN/$_GET[liczba])*$cena_sugerowana,2);
 				?>
 				<td><strong><?SL("suggested_price",$_GET[pricing_lang]);?> (x <?=$cena_sugerowana?>)</strong></td>
 				<td><strong><?=round($SUMA_EUR*$cena_sugerowana,2);?> euro</strong></td>
@@ -592,8 +604,32 @@ $_KURS=$_GET[kurs];
 						</div>
 					<?}
 				}
-				
+	
 				if(!$_GET['print']){
+				                // New Word document
+//echo date('H:i:s') , " Create new PhpWord object" , EOL;
+$phpWord = new \PhpOffice\PhpWord\PhpWord();
+
+$document = $phpWord->loadTemplate('samples/resources/Template'.$_SESSION['user_id'].'.docx');
+
+// Variables on different parts of document
+$document->setValue('client', $SUMMARY_PL[1]); // On section/content
+$document->setValue('day', date('d.m.y.')); // On footer
+//$document->setValue('serverName', realpath(__DIR__)); // On header
+$document->setValue('product_type', $SUMMARY_PL[2]);
+$document->setValue('in_sticker', $SUMMARY_PL[3]);
+$document->setValue('out_sticker', $SUMMARY_PL[4]);
+$document->setValue('mechanism', $SUMMARY_PL[5]);
+$document->setValue('dimensions', $SUMMARY_PL[6]);
+$document->setValue('more_parts', $SUMMARY_PL[7]);
+$document->setValue('amount', $SUMMARY_PL[8]);
+$document->setValue('item_price', $SUMMARY_PL[9]);
+$name = 'wycena'.$_SESSION['user_id'].'.docx';
+echo date('H:i:s'), " Write to Word2007 format", EOL;
+$document->saveAs($name);
+rename($name, "samples/results/{$name}");
+
+echo getEndingNotes(array('Word2007' => 'docx','PDF' => 'pdf'));
 				?>
 				<div class="row-fluid">				
 					<div class="span12">

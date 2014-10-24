@@ -3,8 +3,9 @@ if($_SERVER[SCRIPT_NAME]!="/admin/index.php"){
 	Header("Location: /admin/?site=".str_replace(array("/admin/",".php"),"",$_SERVER[SCRIPT_NAME]));
 	//echo "<hr>".str_replace(array("/admin/",".php"),"",$_SERVER[SCRIPT_NAME]);
 }
-require_once 'PhpWord/Autoloader.php';
-\PhpOffice\PhpWord\Autoloader::register();
+include('samples/Header.php');
+//require_once 'PhpWord/Autoloader.php';
+//\PhpOffice\PhpWord\Autoloader::register();
 // baza
 $serwer = "localhost:3306";
 $user = "uszlachetnia_4";
@@ -134,7 +135,7 @@ function select_drukarnie($name="typ",$no_show="",$auto="1",$select_start="0"){
 <?
 }
 
-function count_transport($quantity="0"){
+function calculate_transport($quantity="0"){
 $transport = 200;
 $transport = ($quantity >= 2500) ? 400 : $transport;
 $transport = ($quantity >= 5000) ? 600 : $transport;
@@ -154,8 +155,8 @@ function calculate_print($print_type, $sheetsize, $sheets, $printhouse){
     //$sql.="szt_od<='".$_GET[liczba]."' AND szt_do='0') ";
     $sql.=" LIMIT 0,1";
     $result=list($id, $print_type, $sheetsize, $price_range, $price, $currency, $name, $local, $standard)=mysql_fetch_row(mysql_query($sql));
-    $cost =number_format($price*$sheets, 3);
-    return array('print_type' => $print_type, 'name' => $name, 'cost'=>$cost);
+    $cost = $price*$sheets;
+    return array('print_type' => $print_type, 'name' => $name, 'cost'=>$cost, 'currency'=>$currency);
 }
 
 /**
@@ -173,7 +174,7 @@ function calculate_toolprint($print_type, $sheetsize, $sheets, $printhouse){
     
     $cost = $base_price + ($sheets -$base_include) * $add_price;
     //$cost = number_format($price*$sheets, 3);
-    return array('print_type' => $print_type, 'name' => $name, 'cost'=>$cost);
+    return array('print_type' => $print_type, 'name' => $name, 'cost'=>$cost, 'currency'=>$currency);
 }
 
 function copy_in_table($table,$typ_from,$typ_to,$id_copy=array()){
