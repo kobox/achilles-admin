@@ -753,7 +753,7 @@ echo getEndingNotes(array('Word2007' => 'docx'));
 					<legend><?SL("next",$_GET[pricing_lang]);?> ...</legend>
 					<p>
 						<!--button class="btn btn-info" type="button">Zapisz aktualną wycenę</button-->
-						<input type="hidden" name="przelicz_nowa" value="0">
+						<input type="hidden" name="_nowa" value="0">
 						<button class="btn btn-danger" name="przelicz" type="submit" value="0" ><?SL("reconfigure",$_GET[pricing_lang]);?></button>
 					</p>
 					</div>
@@ -1693,14 +1693,40 @@ echo getEndingNotes(array('Word2007' => 'docx'));
 									<button class="btn btn-success" name="przelicz" type="submit" value="1" ><?SL("calculate_pricing",$_GET[pricing_lang]);?></button>
 									<?if($_GET[wycena_id]){?>
 										<button class="btn" name="przelicz_nowa" type="submit" value="1" ><?SL("calculate_pricing_and_save",$_GET[pricing_lang]);?></button>
-									<?}?>
+										<a href="#" class="btn btn-lg btn-success" data-toggle="modal" data-target="#basicModal">Upload</a>
+									<?}
+									
+									?>
 								</p>
 								</div>
 							</div>
 							<?}?>
 							</fieldset>
 						<?}?>	
-						</form>				
+						</form>	
+						
+                      	 <div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="myModalLabel">Basic Modal</h4>
+          </div>
+          <div class="modal-body">
+            <form enctype="multipart/form-data">
+                <input type="hidden" name="wycena_id" value="<?=$_GET[wycena_id];?>">
+            <input name="file" type="file" />
+            <input type="button" value="Upload" />
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>  
+             	
 						</div>
 					</div>
 <?
