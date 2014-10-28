@@ -41,6 +41,7 @@ if($_GET[typ]){
 	<script src="../js/libs/jquery-tinyscrollbar.js"></script>
 	<script src="../js/libs/ui.selectmenu.js"></script>
 	<script src="../js/script.js"></script>
+	<script src="js/upload.js"></script>
 	<link href="css/bootstrap.css" rel="stylesheet">	
     <link href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.2/css/bootstrap-select.min.css" rel="stylesheet">
     
@@ -433,7 +434,7 @@ if (($_GET[site] == 'zaloguj') || ($_GET[site] == 'wyloguj')) {
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="js/jquery.js"></script>
+    
     <script src="js/bootstrap-transition.js"></script>
     <script src="js/bootstrap-alert.js"></script>
     <script src="js/bootstrap-modal.js"></script>

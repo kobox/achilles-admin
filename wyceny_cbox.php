@@ -104,6 +104,7 @@ $_KURS=$_GET[kurs];
 				$_koszt_pln[1]=round($cardboard*$price,2);
 				$SUMMARY_PL[1]=$_GET[nazwa_klienta];
 				$SUMMARY_PL[2]=$_GET[typ_nazwa];
+                $SUMMARY_PL[10]=$name;
 					//$sql="SELECT id_format,format_x_od,format_x_do,format_y_od,format_y_do,tektura_x,tektura_y,sztuk_arkusz FROM format_tektura ";
 					//$sql.="WHERE typ='$_GET[typ]' AND (";
 					//$sql.="(format_x_od<='$_GET[format_x]' AND format_x_do>='$_GET[format_x]' ";
@@ -742,6 +743,7 @@ $document->setValue('dimensions', $SUMMARY_PL[6]);
 $document->setValue('more_parts', $SUMMARY_PL[7]);
 $document->setValue('amount', $SUMMARY_PL[8]);
 $document->setValue('item_price', $SUMMARY_PL[9]);
+$document->setValue('material', $SUMMARY_PL[10]);
 $name = 'wycena'.$_SESSION['user_id'].'.docx';
 echo date('H:i:s'), " Write to Word2007 format", EOL;
 $document->saveAs($name);
@@ -813,7 +815,7 @@ echo getEndingNotes(array('Word2007' => 'docx'));
 									<label class="inline"><?SL("cardboard_type",$_GET[pricing_lang]);?>&nbsp;
 									<?
 									//$sql="SELECT DISTINCT druk_typ as druk_typ_oklejka FROM druk_oklejka WHERE typ='$_GET[typ]' AND del='0' ORDER BY druk_typ";
-									$sql="SELECT DISTINCT id as id_material, name FROM materials WHERE typ='tektura' ORDER BY id_material";
+									$sql="SELECT DISTINCT id as id_material, name FROM materials WHERE typ='tektura' OR typ='karton' ORDER BY id_material";
 									$res=mysql_query($sql);
 									?>
 									<select name="tektura" onChange="document.forms['wycena'].action='#Druk_oklejka';document.forms['wycena'].submit()">
@@ -1027,7 +1029,7 @@ echo getEndingNotes(array('Word2007' => 'docx'));
 									<label class="inline"><?SL("paper_type",$_GET[pricing_lang]);?>&nbsp;
 									<?
 									//$sql="SELECT DISTINCT druk_typ as druk_typ_oklejka FROM druk_oklejka WHERE typ='$_GET[typ]' AND del='0' ORDER BY druk_typ";
-									$sql="SELECT DISTINCT id as id_material, name FROM materials WHERE typ='papier' ORDER BY id_material";
+									$sql="SELECT DISTINCT id as id_material, name FROM materials WHERE typ='papier' OR typ='karton' ORDER BY id_material";
 									$res=mysql_query($sql);
 									?>
 									<select name="papiero" onChange="document.forms['wycena'].action='#Druk_oklejka';document.forms['wycena'].submit()">
@@ -1172,7 +1174,7 @@ echo getEndingNotes(array('Word2007' => 'docx'));
                                         $sql.="WHERE id='$_GET[drukarnia]'";
                                         $sql.=" LIMIT 0,1";
                                         list($id, $name, $local, $standard)=mysql_fetch_row(mysql_query($sql));
-										if ($standard == 0) {
+										if ($standard == 0) { // kalkulacja niestandardowa - przyrzad 
 										$result = calculate_toolprint($_GET[druk_typ_oklejka], $_GET[sheetsize], $sheets, $_GET[drukarnia]);
                                         if ($result['name']){
                                             echo "<pre>";
@@ -1261,25 +1263,24 @@ echo getEndingNotes(array('Word2007' => 'docx'));
 										</label>
 										<?
 										if($_GET[druk_typ_wklejka]){
-											$sql="SELECT id_printhouse, print_type, sheetsize, price_range, price, currency, name, local FROM druk_zakres JOIN drukarnie ON id_printhouse = drukarnie.id ";
+										$sql="SELECT * FROM drukarnie ";
                                         //$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
-                                        $sql.="WHERE print_type='$_GET[druk_typ_wklejka]' AND ";
-                                        $sql.="sheetsize ='$_GET[sheetsize]' AND id_printhouse='$_GET[drukarnia]' AND ";
-                                        $sql.="$sheets<=price_range ORDER BY price_range";
-                                        //$sql.="szt_od<='".$_GET[liczba]."' AND szt_do='0') ";
+                                        $sql.="WHERE id='$_GET[drukarnia]'";
                                         $sql.=" LIMIT 0,1";
-                                        list($id, $print_type, $sheetsize, $price_range, $price, $currency, $name)=mysql_fetch_row(mysql_query($sql));
-                                        if ($print_type){
+                                        list($id, $name, $local, $standard)=mysql_fetch_row(mysql_query($sql));
+                                        if ($standard == 0) { // kalkulacja niestandardowa - przyrzad 
+                                        $result = calculate_toolprint($_GET[druk_typ_wklejka], $_GET[sheetsize], $sheets, $_GET[drukarnia]);
+                                        if ($result['name']){
                                             echo "<pre>";
                                             echo "<span class='label label-success'>";
                                             SL("print_type",$_GET[pricing_lang]);
                                             echo ": </span>&nbsp;<strong>";
-                                            echo $_GET[druk_typ_oklejka]." ";
+                                            echo $result['print_type']." ";
                                             echo "<span class='label label-success'>";
                                             //SL("print_type",$_GET[pricing_lang]);
-                                            echo 'Koszt-'; echo $name;
+                                            echo 'Koszt-'; echo $result['name'];
                                             echo ": </span>&nbsp;";
-                                            echo "PLN ".number_format($price*$sheets, 2);
+                                            echo "PLN ".$result['cost'];
                                             echo "</strong>&nbsp;";
                                             //if($cena_szt>0){echo "+ ".$cena_szt." ".$waluta."/szt. ".$cena_typ;}
                                             echo "</strong>";
@@ -1289,6 +1290,37 @@ echo getEndingNotes(array('Word2007' => 'docx'));
                                         SL("no_price",$_GET[pricing_lang]);
                                         echo "</span>";
                                             }
+                                    }else{ //B0
+                                        
+                                        //$sql="SELECT id_printhouse, print_type, sheetsize, price_range, price, currency, name, local, standard FROM druk_zakres JOIN drukarnie ON id_printhouse = drukarnie.id ";
+                                        //$sql.="WHERE print_type='$_GET[druk_typ_oklejka]' AND ";
+                                        //$sql.="sheetsize ='$_GET[sheetsize]' AND id_printhouse='$_GET[drukarnia]' AND ";
+                                        //$sql.="$sheets<=price_range ORDER BY price_range";
+                                        //$sql.="szt_od<='".$_GET[liczba]."' AND szt_do='0') ";
+                                        //$sql.=" LIMIT 0,1";
+                                        //list($id, $print_type, $sheetsize, $price_range, $price, $currency, $name, $local, $standard)=mysql_fetch_row(mysql_query($sql));
+                                        $result = calculate_print($_GET[druk_typ_wklejka], $_GET[sheetsize], $sheets, $_GET[drukarnia]);
+                                        if ($result['name']){
+                                            echo "<pre>";
+                                            echo "<span class='label label-success'>";
+                                            SL("print_type",$_GET[pricing_lang]);
+                                            echo ": </span>&nbsp;<strong>";
+                                            echo $result['print_type']." ";
+                                            echo "<span class='label label-success'>";
+                                            //SL("print_type",$_GET[pricing_lang]);
+                                            echo 'Koszt-'; echo $result['name'];
+                                            echo ": </span>&nbsp;";
+                                            echo "PLN ".$result['cost'];
+                                            echo "</strong>&nbsp;";
+                                            //if($cena_szt>0){echo "+ ".$cena_szt." ".$waluta."/szt. ".$cena_typ;}
+                                            echo "</strong>";
+                                            echo "</pre>";
+                                            } else {
+                                                echo "<span class='label label-warning'>";
+                                        SL("no_price",$_GET[pricing_lang]);
+                                        echo "</span>";
+                                            }
+                                         } //b0
                                    
 										}else{
 											echo "<span class='label label-important'>";
@@ -1710,18 +1742,18 @@ echo getEndingNotes(array('Word2007' => 'docx'));
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title" id="myModalLabel">Basic Modal</h4>
+            <h4 class="modal-title" id="myModalLabel">Załącz Plik</h4>
           </div>
           <div class="modal-body">
-            <form enctype="multipart/form-data">
+            <form id="form_upload" action="#" enctype="multipart/form-data" method="post">
                 <input type="hidden" name="wycena_id" value="<?=$_GET[wycena_id];?>">
-            <input name="file" type="file" />
-            <input type="button" value="Upload" />
-            </form>
+                <input type="file" id="file_upload"  name="file_upload"  />
+                  
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
+            <button type="submit" class="btn btn-primary">Upload</button>
+            </form>
           </div>
         </div>
       </div>
