@@ -53,7 +53,7 @@ $_KURS=$_GET[kurs];
 					<?
 						}
 					}
-				}else{?>
+				}else{?> 
 					<input type="hidden" value="<?=$val?>" name="<?=$key?>">
 			<?	}
 			}
@@ -571,48 +571,33 @@ $_KURS=$_GET[kurs];
                                                         
                 }
 				
-				if($_GET[id_element]){
+				if($_GET[blanking]){
+				    $blanking = mysql_real_escape_string($_GET[blanking]);
 				?>
-					<tr class="warning"><td>11</td><td colspan="5"><?SL("fixed_parts",$_GET[pricing_lang]);?></td></tr>
+					<tr class="warning"><td>11</td><td><?SL("blanking",$_GET[pricing_lang]);?></td>
 					<?
 					//print_r($_GET[id_element]);
-					foreach($_GET[id_element] as $key => $val){
-						if($val){
-							$sql="SELECT id,nazwa".$_GET[pricing_lang]." as nazwa,cena,waluta,z_mechanizmy FROM elementy WHERE id='$val'";
-							list($id,$nazwa,$cena,$waluta,$z_mechanizmy)=mysql_fetch_row(mysql_query($sql));
-							echo "<tr><td></td><td>";
-							//sprawdzamy czy to są nity i dodajemy do wyceny liczbę nitów
-							$_koszt_pln[11]=round($_GET[liczba]*$cena*$_KURS["pln/$waluta"],2);
-							$_koszt_eur[11]=round($_GET[liczba]*$cena*$_KURS["eur/$waluta"],2);
-							echo $nazwa." ".$cena." ".$waluta."/";
-							SL("items",$_GET[pricing_lang]);
-							
-							//if(($id=="3" || $id=="21") && $liczba_nitow_all){
-							if($z_mechanizmy=="1" && $liczba_nitow_all){
-								echo "<br/>";
-								SL("rivets_mechanisms",$_GET[pricing_lang]);
-								echo ": ".$liczba_nitow_all." nity/szt.";
-								$_koszt_pln[11]=round($liczba_nitow_all*$_GET[liczba]*$cena*$_KURS["pln/$waluta"],2);
-								$_koszt_eur[11]=round($liczba_nitow_all*$_GET[liczba]*$cena*$_KURS["eur/$waluta"],2);
-								$_koszt_nity_pln=$_koszt_pln[11];
-								$_koszt_nity_eur=$_koszt_eur[11];
-							}
-							//if($id=="5" || $id=="22"){
-							if($z_mechanizmy=="2"){
-								echo "<br/>";
-								SL("pieces_in_packaging",$_GET[pricing_lang]);
-								echo ": ".$liczba_w_opak." szt/op.";
-								$_koszt_pln[11]=round(($_GET[liczba]/$liczba_w_opak)*$cena*$_KURS["pln/$waluta"],2);
-								$_koszt_eur[11]=round(($_GET[liczba]/$liczba_w_opak)*$cena*$_KURS["eur/$waluta"],2);
-							}
-							$SUMA_PLN+=$_koszt_pln[11];
-							$SUMA_EUR+=$_koszt_eur[11];
-							?>
-							</td><td><?=$_koszt_eur[11];?></td><td><?=round($_koszt_eur[11]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[11];?></td><td><?=round($_koszt_pln[11]/$_GET[liczba],2);?></td></tr>
-							<?
-						}
-					}
-				}
+					$sql="SELECT material, cena, waluta FROM ceny_stale ";
+                            //$sql.="WHERE typ='$_GET[typ]' AND druk_typ='$_GET[druk_typ_oklejka]' AND ";
+                            $sql.="WHERE material='wykrojnik' AND "; // 10 - klej -kaszerowanie
+                            $sql.="typ=12 ORDER BY material";
+                            //$sql.="szt_od<='".$_GET[liczba]."' AND szt_do='0') ";
+                            $sql.=" LIMIT 0,1";
+                            list($material,$price, $waluta)=mysql_fetch_row(mysql_query($sql));
+                            
+                            $_koszt_pln[11]=round($blanking*$price*$_KURS["pln/".$waluta],2);
+                            $_koszt_eur[11]=round($blanking*$price*$_KURS["eur/".$waluta],2);
+                            $SUMA_PLN+=$_koszt_pln[11];
+                            $SUMA_EUR+=$_koszt_eur[11];
+                            ?>
+                            </td><td><?=$_koszt_eur[11];?></td><td><?=round($_koszt_eur[11]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[11];?></td><td><?=round($_koszt_pln[11]/$_GET[liczba],2);?></td></tr>
+                            <?
+				}else{
+                    ?><tr class="warning"><td>11</td><td>
+                    <?SL("blanking",$_GET[pricing_lang]);?></td>
+                    </td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+                    <?
+                }
 				if($_GET[dodatki]){
 				?>
 					<tr class="warning"><td>12</td><td colspan="5"><?SL("more_parts",$_GET[pricing_lang]);?></td></tr>
@@ -712,11 +697,16 @@ $_KURS=$_GET[kurs];
 					}else{
 						echo mysql_error()." <br>".$sql;
 					}
-				}elseif(!$_GET[show_wycena_id]){
+				}elseif(!$_GET[show_wycena_id]){ //zapis nowej kalkulacji
 					$sql="INSERT INTO wyceny (nazwa_klienta,nazwa_zlecenia,szt,koszt_calkowity_eur,koszt_szt_eur,koszt_calkowity_pln,koszt_szt_pln,kurs_eur,parametry,wprow,linkp,data_wprow) VALUES ('".$_GET[nazwa_klienta]."','".$_GET[nazwa_zlecenia]."','".$_GET[liczba]."','".round($SUMA_EUR,2)."','".round($SUMA_EUR/$_GET[liczba],2)."','".round($SUMA_PLN,2)."','".round($SUMA_PLN/$_GET[liczba],2)."','".$_KURS["pln/eur"]."','".serialize($_GET)."','".$_SESSION['user_id']."','pricing_cbox',NOW())";
 					if(mysql_query($sql)){
 						$sql="SELECT MAX(id) FROM wyceny WHERE nazwa_klienta='".$_GET[nazwa_klienta]."' AND nazwa_zlecenia='".$_GET[nazwa_zlecenia]."' AND szt='".$_GET[liczba]."' AND koszt_calkowity_eur='".round($SUMA_EUR,2)."'";
 						list($wycena_id)=mysql_fetch_row(mysql_query($sql));
+						if ($_GET[przelicz_nowa]==1){
+						header("Location: index.php?site=pricing_list&action=list");
+                        die();
+                        }
+                        $_GET[wycena_id] = '';
 						?>
 						<input type="hidden" name="wycena_id" value="<?=$wycena_id;?>">
 					    <div class="alert">
@@ -1605,7 +1595,7 @@ echo getEndingNotes(array('Word2007' => 'docx'));
 							    <div class="span6">
 							<a name="wykrojnik"></a>
 							<legend><?SL("blanking",$_GET[pricing_lang]);?></legend>
-							<label class="inline"><?SL("blanking_mb",$_GET[pricing_lang]);?>&nbsp;<input type="text" maxlength="5" size="4" name="blanking"/>     
+							<label class="inline"><?SL("blanking_mb",$_GET[pricing_lang]);?>&nbsp;<input type="number" maxlength="5" size="4" name="blanking" value="<?=$_GET[blanking];?>"/>     
 							</div>
 							    
 							</div>
