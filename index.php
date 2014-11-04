@@ -39,7 +39,7 @@ if($_GET[typ]){
 	<script src="../js/libs/jquery-1.7.1.min.js"></script>
 	<script src="../js/libs/jquery-ui-1.8.23.custom.min.js"></script>
 	<script src="../js/libs/jquery-tinyscrollbar.js"></script>
-	<script src="../js/libs/ui.selectmenu.js"></script>
+	<!-- <script src="../js/libs/ui.selectmenu.js"></script> -->
 	<script src="../js/script.js"></script>
 	<script src="js/upload.js"></script>
 	<link href="css/bootstrap.css" rel="stylesheet">	
@@ -451,10 +451,8 @@ if (($_GET[site] == 'zaloguj') || ($_GET[site] == 'wyloguj')) {
 <script type="text/javascript">
  //<!--
    $(document).ready(function(){ 
-            $('.selectpicker').selectpicker({
-    style: 'btn-info',
-    size: 3
-    });
+ 
+    
    }); 
    function popup(url) 
    {

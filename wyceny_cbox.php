@@ -729,7 +729,7 @@ $_KURS=$_GET[kurs];
                     // New Word document
 //echo date('H:i:s') , " Create new PhpWord object" , EOL;
 $phpWord = new \PhpOffice\PhpWord\PhpWord();
-$document = $phpWord->loadTemplate('samples/resources/Template'.$_SESSION['user_id'].'.docx');
+$document = $phpWord->loadTemplate('samples/resources/TemplateBox'.$_SESSION['user_id'].'.docx');
 
 // Variables on different parts of document
 $document->setValue('client', $SUMMARY_PL[1]); // On section/content
@@ -1086,7 +1086,7 @@ echo getEndingNotes(array('Word2007' => 'docx'));
 									<label class="inline"><?SL("paper_type",$_GET[pricing_lang]);?>&nbsp;
 									<?
 									//$sql="SELECT DISTINCT druk_typ as druk_typ_oklejka FROM druk_oklejka WHERE typ='$_GET[typ]' AND del='0' ORDER BY druk_typ";
-									$sql="SELECT DISTINCT id as id_material, name FROM materials WHERE typ='papier' ORDER BY id_material";
+									$sql="SELECT DISTINCT id as id_material, name FROM materials WHERE typ='papier' OR typ='karton' ORDER BY id_material";
 									$res=mysql_query($sql);
 									?>
 									<select name="papierw" onChange="document.forms['wycena'].action='#Druk_wklejka';document.forms['wycena'].submit()">
@@ -1600,7 +1600,15 @@ echo getEndingNotes(array('Word2007' => 'docx'));
 									?>
 								</div>
 							</div> 
+							
+							<div class=row-fluid>
+							    <div class="span6">
 							<a name="wykrojnik"></a>
+							<legend><?SL("blanking",$_GET[pricing_lang]);?></legend>
+							<label class="inline"><?SL("blanking_mb",$_GET[pricing_lang]);?>&nbsp;<input type="text" maxlength="5" size="4" name="blanking"/>     
+							</div>
+							    
+							</div>
 							
 							     
 							<div class="row-fluid">
@@ -1730,14 +1738,44 @@ echo getEndingNotes(array('Word2007' => 'docx'));
 									
 									?>
 								</p>
-								</div>
 							</div>
 							<?}?>
 							</fieldset>
 						<?}?>	
 						</form>	
+	<div id="pliki" class="span3">
+	   <?$sql="SELECT id, name FROM files WHERE id_calculation=".$_GET[wycena_id]."  ORDER BY name";
+         $res=mysql_query($sql);
+       ?>
+       <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th data-field="name">Name</th>
+                <th>-</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+         <?
+         while($dane=mysql_fetch_array($res)){
+         $resultFile = 'uploads/'.$dane['name'];
+         if (file_exists($resultFile)) {
+         $resultfiles = "<a href='{$resultFile}' >".$dane['name']."</a>";
+         //
+         echo '<tr>';
+         echo '<td>'.$resultfiles.'</td>'; 
+         echo '<td><a  href="#" id='.$dane['id'].'><i class="icon-trash delete"/></a>'.'</td>'; 
+         echo '</tr>';
+         //$resultfiles="";
+         }   
+         }
+         
+       ?> 
+       </tbody> 
+    </table>        
+	</div>
 						
-                      	 <div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+    <div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -1757,7 +1795,7 @@ echo getEndingNotes(array('Word2007' => 'docx'));
           </div>
         </div>
       </div>
-    </div>  
+    </div>  <!-- .modal -->
              	
 						</div>
 					</div>
