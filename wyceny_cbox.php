@@ -103,7 +103,7 @@ $_KURS=$_GET[kurs];
 				list($id_material,$name, $price_range, $price)=mysql_fetch_row(mysql_query($sql));
 				$_koszt_pln[1]=round($cardboard*$price,2);
 				$SUMMARY_PL[1]=$_GET[nazwa_klienta];
-				$SUMMARY_PL[2]=$_GET[typ_nazwa];
+				$SUMMARY_PL[2]=$_GET[nazwa_zlecenia];
                 $SUMMARY_PL[10]=$name;
 					//$sql="SELECT id_format,format_x_od,format_x_do,format_y_od,format_y_do,tektura_x,tektura_y,sztuk_arkusz FROM format_tektura ";
 					//$sql.="WHERE typ='$_GET[typ]' AND (";
@@ -171,6 +171,7 @@ $_KURS=$_GET[kurs];
 					$_koszt_eur[2] = round($cardboard*$price*$_KURS["eur/$currency"],2);
                     $SUMA_PLN+=$_koszt_pln[2];
 					$SUMA_EUR+=$_koszt_eur[2];
+                    if ($name)
                     $SUMMARY_PL[3] = $name.' , ';
 				?>
 					</td><td><?=$_koszt_eur[2];?></td><td><?=round($_koszt_eur[2]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[2];?></td><td><?=round($_koszt_pln[2]/$_GET[liczba],2);?></td></tr>
@@ -221,7 +222,8 @@ $_KURS=$_GET[kurs];
 					$_koszt_eur[3] = round($cardboard*$price*$_KURS["eur/$currency"],2);
 					$SUMA_PLN+=$_koszt_pln[3];
 					$SUMA_EUR+=$_koszt_eur[3];
-                    $SUMMARY_PL[4] = $name.' , ';
+                    if ($name)
+                    $SUMMARY_PL[4] = $name.', ';
 //                  $SUMMARY_PL[8] = $_GET[liczba].' szt.';
                     $SUMMARY_PL[8] = $_GET[liczba];
 				?>
@@ -262,6 +264,7 @@ $_KURS=$_GET[kurs];
                            $_koszt_pln[4]=0;
                            $_koszt_eur[4]=0;
                         }   
+                        if ($result['print_type'])
                         $SUMMARY_PL[3] .= $result['print_type'].' , ';
 						?>
 						</td><td><?=$_koszt_eur[4];?></td><td><?=round($_koszt_eur[4]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[4];?></td><td><?=round($_koszt_pln[4]/$_GET[liczba],2);?></td></tr>
@@ -307,6 +310,7 @@ $_KURS=$_GET[kurs];
                            $_koszt_pln[5]=0;
                            $_koszt_eur[5]=0;
                         }   
+                        if ($result['print_type'])
                         $SUMMARY_PL[4] .= $result['print_type'].' , ';
 						?>
 						</td><td><?=$_koszt_eur[5];?></td><td><?=round($_koszt_eur[5]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[5];?></td><td><?=round($_koszt_pln[5]/$_GET[liczba],2);?></td></tr>
@@ -349,6 +353,7 @@ $_KURS=$_GET[kurs];
 						$_koszt_eur[6]=round(($cardboard*($cena*$_KURS["eur/$waluta"])),2);
 						$SUMA_PLN+=$_koszt_pln[6];
 						$SUMA_EUR+=$_koszt_eur[6];
+                        if ($nazwa_folia_oklejka)
                         $SUMMARY_PL[3] .= 'Folia: '.$nazwa_folia_oklejka.' , ';
 						?>
 						</td><td><?=$_koszt_eur[6];?></td><td><?=round($_koszt_eur[6]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[6];?></td><td><?=round($_koszt_pln[6]/$_GET[liczba],2);?></td></tr>
@@ -393,6 +398,7 @@ $_KURS=$_GET[kurs];
 						$_koszt_eur[7]=round(($cardboard*($cena*$_KURS["eur/$waluta"])),2);
 						$SUMA_PLN+=$_koszt_pln[7];
 						$SUMA_EUR+=$_koszt_eur[7];
+                        if ($nazwa_folia_wklejka)
                         $SUMMARY_PL[4] .= 'Folia: '.$nazwa_folia_wklejka.' , ';
 						?>
 						</td><td><?=$_koszt_eur[7];?></td><td><?=round($_koszt_eur[7]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[7];?></td><td><?=round($_koszt_pln[7]/$_GET[liczba],2);?></td></tr>
@@ -434,6 +440,7 @@ $_KURS=$_GET[kurs];
 					}
 					$SUMA_PLN+=$_koszt_pln[8];
 					$SUMA_EUR+=$_koszt_eur[8];
+                    if ($_GET[lakierowanie_typ_oklejka])
                     $SUMMARY_PL[3] .= 'lakier UV- '.$_GET[lakierowanie_typ_oklejka].' , ';
 					?>
 					</td><td><?=$_koszt_eur[8];?></td><td><?=round($_koszt_eur[8]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[8];?></td><td><?=round($_koszt_pln[8]/$_GET[liczba],2);?></td></tr>
@@ -475,6 +482,7 @@ $_KURS=$_GET[kurs];
 					}
 					$SUMA_PLN+=$_koszt_pln[9];
 					$SUMA_EUR+=$_koszt_eur[9];
+					if ($_GET[lakierowanie_typ_wklejka])
 					$SUMMARY_PL[4] .= 'lakier UV- '.$_GET[lakierowanie_typ_wklejka].' , ';
 					?>
 					</td><td><?=$_koszt_eur[9];?></td><td><?=round($_koszt_eur[9]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[9];?></td><td><?=round($_koszt_pln[9]/$_GET[liczba],2);?></td></tr>
@@ -617,7 +625,7 @@ $_KURS=$_GET[kurs];
 							}
 							$SUMA_PLN+=$_koszt_pln[12];
 							$SUMA_EUR+=$_koszt_eur[12];
-                            $SUMMARY_PL[7] .= $val.' , ';
+                            $SUMMARY_PL[7] .= $val." ,\n";
 							?>
 							</td><td><?=$_koszt_eur[12];?></td><td><?=round($_koszt_eur[12]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[12];?></td><td><?=round($_koszt_pln[12]/$_GET[liczba],2);?></td></tr>
 							<?
@@ -720,22 +728,37 @@ $_KURS=$_GET[kurs];
 //echo date('H:i:s') , " Create new PhpWord object" , EOL;
 $phpWord = new \PhpOffice\PhpWord\PhpWord();
 $document = $phpWord->loadTemplate('samples/resources/TemplateBox'.$_SESSION['user_id'].'.docx');
-
 // Variables on different parts of document
-$document->setValue('client', $SUMMARY_PL[1]); // On section/content
-$document->setValue('day', date('d.m.y.')); // On footer
+$document->setValue('client', $SUMMARY_PL[1]); 
+$document->setValue('day', date('d.m.y.')); 
 //$document->setValue('serverName', realpath(__DIR__)); // On header
+if ($SUMMARY_PL[2])
 $document->setValue('product_type', $SUMMARY_PL[2]);
-$document->setValue('in_sticker', $SUMMARY_PL[3]);
-$document->setValue('out_sticker', $SUMMARY_PL[4]);
+if (!$SUMMARY_PL[3]) $SUMMARY_PL[3]='-'; 
+$document->setValue('out_sticker', $SUMMARY_PL[3]);
+
+//if (!$SUMMARY_PL[4]) {
+//    if ($SUMMARY_PL[3]!='-' && !$_GET[bez_papier_wklejka]=="1")
+//    $SUMMARY_PL[4]='zawarty w cenie druku oklejki'; else {
+//        $SUMMARY_PL[4]='-';
+//    } 
+    
+//}
+
+if (!$SUMMARY_PL[4]) $SUMMARY_PL[4]='-';
+$document->setValue('in_sticker', $SUMMARY_PL[4]);
+if (!$SUMMARY_PL[5]) $SUMMARY_PL[5]='-'; 
 $document->setValue('mechanism', $SUMMARY_PL[5]);
+if (!$SUMMARY_PL[6]) $SUMMARY_PL[6]='-'; 
 $document->setValue('dimensions', $SUMMARY_PL[6]);
+if (!$SUMMARY_PL[7]) $SUMMARY_PL[7]='-'; 
 $document->setValue('more_parts', $SUMMARY_PL[7]);
+if (!$SUMMARY_PL[8]) $SUMMARY_PL[8]=$_GET[liczba]; 
 $document->setValue('amount', $SUMMARY_PL[8]);
 $document->setValue('item_price', $SUMMARY_PL[9]);
-$document->setValue('material', $SUMMARY_PL[10]);
+$document->setValue('material', $SUMMARY_PL[10]); // rodzaj tektury
 $name = 'wycena'.$_SESSION['user_id'].'.docx';
-echo date('H:i:s'), " Write to Word2007 format", EOL;
+echo date('H:i:s'), " Generowanie oferty", EOL;
 $document->saveAs($name);
 rename($name, "samples/results/{$name}");
 echo getEndingNotes(array('Word2007' => 'docx'));  
@@ -986,7 +1009,7 @@ echo getEndingNotes(array('Word2007' => 'docx'));
 									&nbsp;
 									</span>
 									</legend>
-									<label class="inline"><?SL("customer_name",$_GET[pricing_lang]);?> &nbsp; <input type="text" placeholder="<?SL("customer_name",$_GET[pricing_lang]);?>" name="nazwa_klienta" value="<?=$_GET[nazwa_klienta]?>" onChange="document.forms['wycena'].action='#Parametry_wyceny';document.forms['wycena'].submit()">&nbsp;<small><?SL("required",$_GET[pricing_lang]);?></small></label>
+									<label class="inline"><?SL("customer_name",$_GET[pricing_lang]);?> &nbsp; <textarea cols="20" rows="2" placeholder="<?SL("customer_name",$_GET[pricing_lang]);?>" name="nazwa_klienta" onChange="document.forms['wycena'].action='#Parametry_wyceny';document.forms['wycena'].submit()"><?=$_GET[nazwa_klienta]?></textarea>&nbsp;<small><?SL("required",$_GET[pricing_lang]);?></small></label>
 									<label class="inline"><?SL("order_name",$_GET[pricing_lang]);?> &nbsp; <input type="text" placeholder="<?SL("order_name",$_GET[pricing_lang]);?>" name="nazwa_zlecenia" value="<?=$_GET[nazwa_zlecenia]?>" onChange="document.forms['wycena'].action='#Parametry_wyceny';document.forms['wycena'].submit()">&nbsp;<small><?SL("required",$_GET[pricing_lang]);?></small></label>
 									<label class="inline"><?SL("items",$_GET[pricing_lang]);?> &nbsp; <input type="text" class="input-small" name="liczba" value="<?=$_GET[liczba]?>">&nbsp;<small><?SL("required",$_GET[pricing_lang]);?></small>
 									<button class="btn btn-mini btn-primary" type="button" onClick="document.forms['wycena'].action='#Parametry_wyceny';document.forms['wycena'].submit()"><?SL("change",$_GET[pricing_lang]);?></button></label>
@@ -1733,6 +1756,8 @@ echo getEndingNotes(array('Word2007' => 'docx'));
 							</fieldset>
 						<?}?>	
 						</form>	
+	<?php if(!$_GET['print']){
+	?>
 	<div id="pliki" class="span3">
 	   <?$sql="SELECT id, name FROM files WHERE id_calculation=".$_GET[wycena_id]."  ORDER BY name";
          $res=mysql_query($sql);
@@ -1754,7 +1779,9 @@ echo getEndingNotes(array('Word2007' => 'docx'));
          //
          echo '<tr>';
          echo '<td>'.$resultfiles.'</td>'; 
-         echo '<td><a  href="#" id='.$dane['id'].'><i class="icon-trash delete"/></a>'.'</td>'; 
+         if (!$_GET['show_wycena_id'])
+         echo '<td><a  href="#" id='.$dane['id'].'><i class="icon-trash delete"/></a>'.'</td>';
+         else echo "<td></td>"; 
          echo '</tr>';
          //$resultfiles="";
          }   
@@ -1764,7 +1791,7 @@ echo getEndingNotes(array('Word2007' => 'docx'));
        </tbody> 
     </table>        
 	</div>
-						
+	<?}?>					
     <div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">

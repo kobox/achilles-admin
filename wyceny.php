@@ -110,7 +110,7 @@ $_KURS=$_GET[kurs];
 					$SUMA_PLN=$_koszt_pln[1];
 					$SUMA_EUR=$_koszt_eur[1];
                     $SUMMARY_PL[1]=$_GET[nazwa_klienta];
-                    $SUMMARY_PL[2]=$_GET[typ_nazwa];
+                    $SUMMARY_PL[2]=$_GET[nazwa_zlecenia];
                     $SUMMARY_PL[6]=$_GET[format_x]." x ". $_GET[format_y]." mm";
                     $SUMMARY_PL[8]=$_GET[liczba];
 				?>
@@ -216,7 +216,8 @@ $_KURS=$_GET[kurs];
 						<?
 						$SUMA_PLN+=$_koszt_pln[4];
 						$SUMA_EUR+=$_koszt_eur[4];
-                        $SUMMARY_PL[3] = $_GET[druk_typ_oklejka].' , ';
+                        if ($_GET[druk_typ_oklejka])
+                        $SUMMARY_PL[3] = $_GET[druk_typ_oklejka].', ';
 					}else{
 						?>
 						</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
@@ -258,6 +259,7 @@ $_KURS=$_GET[kurs];
 						<?
 						$SUMA_PLN+=$_koszt_pln[5];	
 						$SUMA_EUR+=$_koszt_eur[5];
+                        if ($_GET[druk_typ_wklejka])
                         $SUMMARY_PL[4] = $_GET[druk_typ_wklejka].', ';
 					}else{
 						?>
@@ -292,6 +294,7 @@ $_KURS=$_GET[kurs];
 						$_koszt_eur[6]=round(($_GET[liczba]*($cena*$_KURS["eur/$waluta"])*($folia_oklejka_x/1000)*($folia_oklejka_y/1000))/$sztuk_arkusz,2);
 						$SUMA_PLN+=$_koszt_pln[6];
 						$SUMA_EUR+=$_koszt_eur[6];
+						if ($nazwa_folia_oklejka)
                         $SUMMARY_PL[3] .= 'Folia '.$nazwa_folia_oklejka.', ';
 						?>
 						</td><td><?=$_koszt_eur[6];?></td><td><?=round($_koszt_eur[6]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[6];?></td><td><?=round($_koszt_pln[6]/$_GET[liczba],2);?></td></tr>
@@ -333,6 +336,7 @@ $_KURS=$_GET[kurs];
 						$_koszt_eur[7]=round(($_GET[liczba]*($cena*$_KURS["eur/$waluta"])*($folia_wklejka_x/1000)*($folia_wklejka_y/1000))/$sztuk_arkusz,2);
 						$SUMA_PLN+=$_koszt_pln[7];
 						$SUMA_EUR+=$_koszt_eur[7];
+						if ($nazwa_folia_wklejka)
 						$SUMMARY_PL[4] .= 'Folia '.$nazwa_folia_wklejka.', ';
 						?>
 						</td><td><?=$_koszt_eur[7];?></td><td><?=round($_koszt_eur[7]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[7];?></td><td><?=round($_koszt_pln[7]/$_GET[liczba],2);?></td></tr>
@@ -373,6 +377,7 @@ $_KURS=$_GET[kurs];
 					}
 					$SUMA_PLN+=$_koszt_pln[8];
 					$SUMA_EUR+=$_koszt_eur[8];
+                    if ($_GET[lakierowanie_typ_oklejka])
                     $SUMMARY_PL[3] .= 'Lakier UV - '.$_GET[lakierowanie_typ_oklejka].', ';
 					?>
 					</td><td><?=$_koszt_eur[8];?></td><td><?=round($_koszt_eur[8]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[8];?></td><td><?=round($_koszt_pln[8]/$_GET[liczba],2);?></td></tr>
@@ -413,6 +418,7 @@ $_KURS=$_GET[kurs];
 					}
 					$SUMA_PLN+=$_koszt_pln[9];
 					$SUMA_EUR+=$_koszt_eur[9];
+					if ($_GET[lakierowanie_typ_wklejka])
 					$SUMMARY_PL[4] .= 'Lakier UV - '.$_GET[lakierowanie_typ_wklejka].', ';
 					?>
 					</td><td><?=$_koszt_eur[9];?></td><td><?=round($_koszt_eur[9]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[9];?></td><td><?=round($_koszt_pln[9]/$_GET[liczba],2);?></td></tr>
@@ -441,7 +447,7 @@ $_KURS=$_GET[kurs];
 								echo ": ".$liczba_szt_pudlo.") ";
 								SL("price",$_GET[pricing_lang]);
 								echo ": ".$cena." ".$waluta.", ";
-								$SUMMARY_PL[5] .= $nazwa." ".$typ_mechanizm.', ';
+								$SUMMARY_PL[5] .= $typ_mechanizm.", ";
 								$liczba_nitow_all+=$liczba_nitow;
 								if($liczba_szt_pudlo>$liczba_w_opak)$liczba_w_opak=$liczba_szt_pudlo;
 							$_koszt_pln[10]=round($_GET[liczba]*$cena*$_KURS["pln/".$waluta],2);
@@ -515,7 +521,7 @@ $_KURS=$_GET[kurs];
 							}
 							$SUMA_PLN+=$_koszt_pln[12];
 							$SUMA_EUR+=$_koszt_eur[12];
-                            $SUMMARY_PL[7] .= $val.', ';
+                            $SUMMARY_PL[7] .= $val.",\n";
 							?>
 							</td><td><?=$_koszt_eur[12];?></td><td><?=round($_koszt_eur[12]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[12];?></td><td><?=round($_koszt_pln[12]/$_GET[liczba],2);?></td></tr>
 							<?
@@ -617,11 +623,16 @@ $document->setValue('client', $SUMMARY_PL[1]); // On section/content
 $document->setValue('day', date('d.m.y.')); // On footer
 //$document->setValue('serverName', realpath(__DIR__)); // On header
 $document->setValue('product_type', $SUMMARY_PL[2]);
-$document->setValue('in_sticker', $SUMMARY_PL[3]);
-$document->setValue('out_sticker', $SUMMARY_PL[4]);
+if (!$SUMMARY_PL[3]) $SUMMARY_PL[3]='-';
+$document->setValue('out_sticker', $SUMMARY_PL[3]);
+if (!$SUMMARY_PL[4]) $SUMMARY_PL[4]='-';
+$document->setValue('in_sticker', $SUMMARY_PL[4]);
+if (!$SUMMARY_PL[5]) $SUMMARY_PL[5]='-';
 $document->setValue('mechanism', $SUMMARY_PL[5]);
 $document->setValue('dimensions', $SUMMARY_PL[6]);
+if (!$SUMMARY_PL[7]) $SUMMARY_PL[7]='-';
 $document->setValue('more_parts', $SUMMARY_PL[7]);
+
 $document->setValue('amount', $SUMMARY_PL[8]);
 $document->setValue('item_price', $SUMMARY_PL[9]);
 $name = 'wycena'.$_SESSION['user_id'].'.docx';
@@ -791,7 +802,7 @@ echo getEndingNotes(array('Word2007' => 'docx','PDF' => 'pdf'));
 									&nbsp;
 									</span>
 									</legend>
-									<label class="inline"><?SL("customer_name",$_GET[pricing_lang]);?> &nbsp; <input type="text" placeholder="<?SL("customer_name",$_GET[pricing_lang]);?>" name="nazwa_klienta" value="<?=$_GET[nazwa_klienta]?>" onChange="document.forms['wycena'].action='#Parametry_wyceny';document.forms['wycena'].submit()">&nbsp;<small><?SL("required",$_GET[pricing_lang]);?></small></label>
+									<label class="inline"><?SL("customer_name",$_GET[pricing_lang]);?> &nbsp; <textarea cols="20" rows="2" placeholder="<?SL("customer_name",$_GET[pricing_lang]);?>" name="nazwa_klienta" onChange="document.forms['wycena'].action='#Parametry_wyceny';document.forms['wycena'].submit()"><?=$_GET[nazwa_klienta]?></textarea>&nbsp;<small><?SL("required",$_GET[pricing_lang]);?></small></label>
 									<label class="inline"><?SL("order_name",$_GET[pricing_lang]);?> &nbsp; <input type="text" placeholder="<?SL("order_name",$_GET[pricing_lang]);?>" name="nazwa_zlecenia" value="<?=$_GET[nazwa_zlecenia]?>" onChange="document.forms['wycena'].action='#Parametry_wyceny';document.forms['wycena'].submit()">&nbsp;<small><?SL("required",$_GET[pricing_lang]);?></small></label>
 									<label class="inline"><?SL("items",$_GET[pricing_lang]);?> &nbsp; <input type="text" class="input-small" name="liczba" value="<?=$_GET[liczba]?>">&nbsp;<small><?SL("required",$_GET[pricing_lang]);?></small>
 									<button class="btn btn-mini btn-primary" type="button" onClick="document.forms['wycena'].action='#Parametry_wyceny';document.forms['wycena'].submit()"><?SL("change",$_GET[pricing_lang]);?></button></label>
