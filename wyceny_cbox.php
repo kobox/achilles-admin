@@ -595,8 +595,9 @@ $_KURS=$_GET[kurs];
                             
                             $_koszt_pln[11]=round($blanking*$price*$_KURS["pln/".$waluta],2);
                             $_koszt_eur[11]=round($blanking*$price*$_KURS["eur/".$waluta],2);
-                            $SUMA_PLN+=$_koszt_pln[11];
-                            $SUMA_EUR+=$_koszt_eur[11];
+                            //$SUMA_PLN+=$_koszt_pln[11];
+                            //$SUMA_EUR+=$_koszt_eur[11];
+                            $SUMMARY_PL[11]= $_koszt_pln[11];
                             ?>
                             </td><td><?=$_koszt_eur[11];?></td><td><?=round($_koszt_eur[11]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[11];?></td><td><?=round($_koszt_pln[11]/$_GET[liczba],2);?></td></tr>
                             <?
@@ -679,18 +680,20 @@ $_KURS=$_GET[kurs];
 				<tr class="success">
 				<td></td>
 				<?
-				$sql="SELECT cena as cena_sugerowana FROM cena_sugerowana WHERE 
+				$sql="SELECT cena as cena_sugerowana, percent, markup FROM cena_sugerowana WHERE 
 				(szt_od<$_GET[liczba] AND szt_do>$_GET[liczba]) OR (szt_od<$_GET[liczba] AND szt_do=0)
 				AND typ='$_GET[typ]'";
-				list($cena_sugerowana)=mysql_fetch_row(mysql_query($sql));
+				list($cena_sugerowana, $percent, $markup)=mysql_fetch_row(mysql_query($sql));
+                // Cena do Generowanej oferty
                 $SUMMARY_PL[9] = round(($SUMA_PLN/$_GET[liczba])*$cena_sugerowana,2);
+                $suggested_price= calculate_suggested_price($SUMA_PLN,$SUMA_EUR, $_KURS["pln/eur"]);
                 //$SUMMARY_PL[9] .= ' PLN';
 				?>
 				<td><strong><?SL("suggested_price",$_GET[pricing_lang]);?> (x <?=$cena_sugerowana?>)</strong></td>
-				<td><strong><?=round($SUMA_EUR*$cena_sugerowana,2);?> euro</strong></td>
+				<td><strong><?=round($suggested_price[1],2);?> euro</strong></td>
 				<td><strong><?=round(($SUMA_EUR/$_GET[liczba])*$cena_sugerowana,2);?> euro/<?SL("per_item",$_GET[pricing_lang]);?></strong></td>
-				<td><strong><?=round($SUMA_PLN*$cena_sugerowana,2);?> zł</strong></td>
-				<td><strong><?=round(($SUMA_PLN/$_GET[liczba])*$cena_sugerowana,2);?> zł/<?SL("per_item",$_GET[pricing_lang]);?></strong></td>
+				<td><strong><?=round($suggested_price[0],2);?> zł</strong></td>
+				<td><strong><?=round(($suggested_price[0]/$_GET[liczba]),2);?> zł/<?SL("per_item",$_GET[pricing_lang]);?></strong></td>
 				</tr>
 				</table>
 				<?
@@ -757,6 +760,8 @@ if (!$SUMMARY_PL[8]) $SUMMARY_PL[8]=$_GET[liczba];
 $document->setValue('amount', $SUMMARY_PL[8]);
 $document->setValue('item_price', $SUMMARY_PL[9]);
 $document->setValue('material', $SUMMARY_PL[10]); // rodzaj tektury
+
+$document->setValue('cutter_price', $SUMMARY_PL[11]); // wykrojnik
 $name = 'wycena'.$_SESSION['user_id'].'.docx';
 echo date('H:i:s'), " Generowanie oferty", EOL;
 $document->saveAs($name);

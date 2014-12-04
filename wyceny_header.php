@@ -177,6 +177,26 @@ function calculate_toolprint($print_type, $sheetsize, $sheets, $printhouse){
     return array('print_type' => $print_type, 'name' => $name, 'cost'=>$cost, 'currency'=>$currency);
 }
 
+function calculate_suggested_price($sum_pl, $sum_eur, $eur){
+    $result=array();
+    $sql="SELECT cena as cena_sugerowana, percent, markup FROM cena_sugerowana WHERE 
+          (szt_od<$_GET[liczba] AND szt_do>$_GET[liczba]) OR (szt_od<$_GET[liczba] AND szt_do=0)
+          AND typ='$_GET[typ]'";
+    
+    list($cena_sugerowana, $percent, $markup)=mysql_fetch_row(mysql_query($sql));
+    if ($percent==1){
+        $result[0] = $sum_pl*$cena_sugerowana/100;
+        $result[1] = $sum_eur*$cena_sugerowana/100;
+    } else {
+        $result[0] = $sum_pl*$cena_sugerowana;
+        $result[1] = $sum_eur*$cena_sugerowana;
+    }
+    if ($result[0]<500){
+        $result[0] =500;
+        $result[1] = 500*$eur;
+    } 
+    return $result;
+}
 function copy_in_table($table,$typ_from,$typ_to,$id_copy=array()){
 	global $alert, $alert_ok;
 	$sql="SELECT * FROM $table WHERE typ=$typ_from";
