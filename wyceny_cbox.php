@@ -625,7 +625,7 @@ $_KURS=$_GET[kurs];
 							}
 							$SUMA_PLN+=$_koszt_pln[12];
 							$SUMA_EUR+=$_koszt_eur[12];
-                            $SUMMARY_PL[7] .= $val." ,\n";
+                            $SUMMARY_PL[7] .= $val.",\n";
 							?>
 							</td><td><?=$_koszt_eur[12];?></td><td><?=round($_koszt_eur[12]/$_GET[liczba],2);?></td><td><?=$_koszt_pln[12];?></td><td><?=round($_koszt_pln[12]/$_GET[liczba],2);?></td></tr>
 							<?
