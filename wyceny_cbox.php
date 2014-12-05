@@ -671,7 +671,7 @@ $_KURS=$_GET[kurs];
 				}?>
 				<tr class="success">
 				<td></td>
-				<td><strong><?SL("sum",$_GET[pricing_lang]);?></strong></td>				
+				<td><strong><?SL("sum",$_GET[pricing_lang]);?> <span style="color:#DF7401;">(poz. 11 &notin; &sum;)</span></strong></td>				
 				<td><strong><?=round($SUMA_EUR,2);?> euro</strong></td>
 				<td><strong><?=round($SUMA_EUR/$_GET[liczba],2);?> euro/<?SL("per_item",$_GET[pricing_lang]);?></strong></td>
 				<td><strong><?=round($SUMA_PLN,2);?> zł</strong></td>
@@ -685,13 +685,14 @@ $_KURS=$_GET[kurs];
 				AND typ='$_GET[typ]'";
 				list($cena_sugerowana, $percent, $markup)=mysql_fetch_row(mysql_query($sql));
                 // Cena do Generowanej oferty
-                $SUMMARY_PL[9] = round(($SUMA_PLN/$_GET[liczba])*$cena_sugerowana,2);
-                $suggested_price= calculate_suggested_price($SUMA_PLN,$SUMA_EUR, $_KURS["pln/eur"]);
+                
+                $suggested_price = calculate_suggested_price($SUMA_PLN,$SUMA_EUR, $_KURS["eur/pln"]);
                 //$SUMMARY_PL[9] .= ' PLN';
+                $SUMMARY_PL[9] = round(($suggested_price[0]/$_GET[liczba]),2);
 				?>
-				<td><strong><?SL("suggested_price",$_GET[pricing_lang]);?> (x <?=$cena_sugerowana?>)</strong></td>
+				<td><strong><?SL("suggested_price",$_GET[pricing_lang]);?> (<?if ($percent) echo '+'.$cena_sugerowana.'%'; else echo 'x'.$cena_sugerowana; ?>)</strong></td>
 				<td><strong><?=round($suggested_price[1],2);?> euro</strong></td>
-				<td><strong><?=round(($SUMA_EUR/$_GET[liczba])*$cena_sugerowana,2);?> euro/<?SL("per_item",$_GET[pricing_lang]);?></strong></td>
+				<td><strong><?=round(($suggested_price[1]/$_GET[liczba]),2);?> euro/<?SL("per_item",$_GET[pricing_lang]);?></strong></td>
 				<td><strong><?=round($suggested_price[0],2);?> zł</strong></td>
 				<td><strong><?=round(($suggested_price[0]/$_GET[liczba]),2);?> zł/<?SL("per_item",$_GET[pricing_lang]);?></strong></td>
 				</tr>

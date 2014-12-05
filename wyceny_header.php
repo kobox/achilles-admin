@@ -183,18 +183,21 @@ function calculate_suggested_price($sum_pl, $sum_eur, $eur){
           (szt_od<$_GET[liczba] AND szt_do>$_GET[liczba]) OR (szt_od<$_GET[liczba] AND szt_do=0)
           AND typ='$_GET[typ]'";
     
-    list($cena_sugerowana, $percent, $markup)=mysql_fetch_row(mysql_query($sql));
+    list($cena_sugerowana, $percent, $markup_rate)=mysql_fetch_row(mysql_query($sql));
     if ($percent==1){
-        $result[0] = $sum_pl*$cena_sugerowana/100;
-        $result[1] = $sum_eur*$cena_sugerowana/100;
+        $markup_pl = $sum_pl*$cena_sugerowana/100;
+        $markup_eur = $sum_eur*$cena_sugerowana/100;
+        if ($markup_pl<$markup_rate){
+        $markup_pl =$markup_rate;
+        $markup_eur = $markup_rate*$eur;
+        }
+        $result[0] = $sum_pl+$markup_pl;
+        $result[1] = $sum_eur+$markup_eur;
     } else {
         $result[0] = $sum_pl*$cena_sugerowana;
         $result[1] = $sum_eur*$cena_sugerowana;
     }
-    if ($result[0]<500){
-        $result[0] =500;
-        $result[1] = 500*$eur;
-    } 
+    
     return $result;
 }
 function copy_in_table($table,$typ_from,$typ_to,$id_copy=array()){
