@@ -217,7 +217,34 @@ td,
 th {
   padding: 0;
 }
-
+.s9:before, .s9:after {
+   z-index: -1;
+   position: absolute;
+   content: "";
+   bottom: 15px;
+   left: 10px;
+   width: 50%;
+   top: 80%;
+   max-width:300px;
+   background: #777;
+   -webkit-box-shadow: 0 15px 10px #777;
+   -moz-box-shadow: 0 15px 10px #777;
+   box-shadow: 0 15px 10px #777;
+   -webkit-transform: rotate(-3deg);
+   -moz-transform: rotate(-3deg);
+   -o-transform: rotate(-3deg);
+   -ms-transform: rotate(-3deg);
+   transform: rotate(-3deg);
+}
+.s9:after {
+   -webkit-transform: rotate(3deg);
+   -moz-transform: rotate(3deg);
+   -o-transform: rotate(3deg);
+   -ms-transform: rotate(3deg);
+   transform: rotate(3deg);
+   right: 10px;
+   left: auto;
+}
 @media print {
   * {
     text-shadow: none !important;
@@ -1143,7 +1170,8 @@ html {
 }
 
 body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  
+  font-family: 'Glegoo', sans-serif;
   font-size: 17px;
   line-height: 1.42857;
   color: #696f6f;
@@ -1228,7 +1256,7 @@ img {
   left: 10px;
   width: 50%;
   top: 80%;
-  max-width:300px;
+  max-width:250px;
   background: #777;
   -webkit-box-shadow: 0 15px 10px #777;
   -moz-box-shadow: 0 15px 10px #777;
@@ -3684,6 +3712,7 @@ tbody.collapse.in {
 }
 .jumbotron h1,
 .jumbotron .h1 {
+  font-family: 'Marck Script', sans-serif;
   color: #333;
 }
 .jumbotron p {
@@ -3744,6 +3773,26 @@ tbody.collapse.in {
 @media screen and (max-width: 800px) {
   .jumbotron .img-iPhone {
     margin-top: 50px;
+    width: 500px;
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .jumbotron .img-iPhone {
+    width: 600px;
+    height: auto;
+  }
+}
+@media screen and (max-width: 1024px) {
+  .jumbotron .img-iPhone {
+    width: 500px;
+    height: auto;
+  }
+}
+@media screen and (max-width: 640px) {
+  .jumbotron .img-iPhone {
+    width: 350px;
+    height: auto;
   }
 }
 @media screen and (max-width: 480px) {
@@ -3758,13 +3807,13 @@ tbody.collapse.in {
     height: auto;
   }
 }
-.jumbotron .btn-app-store {
+.jumbotron .panel-infobox {
   margin-top: 40px;
 }
-.jumbotron .btn-app-store .btn.btn-lg, .jumbotron .btn-app-store .btn-group-lg > .btn {
+.jumbotron .panel-infobox .btn.btn-lg, .jumbotron .btn-app-store .btn-group-lg > .btn {
   padding: 0;
 }
-.jumbotron .btn-app-store .btn img {
+.jumbotron .panel-infobox .btn img {
   display: block;
   margin-left: auto;
   margin-right: auto;
@@ -6368,7 +6417,11 @@ tbody.collapse.in {
 }
 
 .item-thumbs a + img {
-  width: 100%;  
+  width: 100%;
+   border:1px solid #ccc;
+   padding:5px;
+   background:#f2f2f2;
+   
 }
 
 .item-thumbs .hover-wrap {
