@@ -1176,7 +1176,7 @@ body {
   font-family: 'Glegoo', sans-serif;
   font-size: 17px;
   line-height: 1.42857;
-  color: #696f6f;
+  color: #424242;
   background-color: white;
 }
 body.sign-in-up {
@@ -3705,7 +3705,7 @@ tbody.collapse.in {
 }
 
 .jumbotron {
-  padding: 30px 0;
+  padding: 0;
   margin-bottom: 0;
   color: grey;
   background: #2e2f41 url(../images/bg-1.png) 0 0 no-repeat;
@@ -3738,9 +3738,20 @@ text-align: left;
 .jumbotron .container {
   max-width: 1200px;
 }
+.phone {
+  background: #fffedb;
+  padding: 5px 0;
+  text-align: right;
+  margin-bottom: 30px;
+  border-bottom: solid yellow 1px;
+}
+.phone .container{
+
+}
+
 @media screen and (min-width: 768px) {
   .jumbotron {
-    padding-top: 100px;
+    padding-top: 0px;
     padding-bottom: 100px;
   }
   .container .jumbotron {
@@ -6033,9 +6044,9 @@ text-align: left;
 }
 
 .services-section {
-  background: white;
+  background: #FAFAFA;
   text-align: center;
-  padding: 60px 0;
+  padding: 0px 0;
 }
 .services-section .row.row-padding {
   padding-top: 40px;
@@ -6082,7 +6093,7 @@ text-align: left;
 }
 
 .features-section {
-  background: #f3f4f5;
+  background: green url(../images/products-bg.png);
   text-align: left;
   padding: 50px 0;
 }
@@ -6411,12 +6422,12 @@ text-align: left;
   color: #DE5E60;
 }
 
-#thumbs {
+#thumbs, #thumbs-2 {
   margin: 0;
   padding: 0; 
 }
 
-#thumbs li {
+#thumbs, #thumbs-2 li {
   list-style-type: none;
 }
 
